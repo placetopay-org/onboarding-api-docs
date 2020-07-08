@@ -216,7 +216,7 @@ paths:
         in: path
         required: true
     get:
-      summary: show
+      summary: Show Onboarding Request
       tags: []
       responses:
         '200':
