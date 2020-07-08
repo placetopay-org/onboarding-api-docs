@@ -14,7 +14,8 @@ paths:
   /onboarding-requests:
     get:
       summary: Index Onboarding Requests
-      tags: []
+      tags:
+        - Onboarding Requests
       responses:
         '200':
           description: OK
@@ -330,7 +331,15 @@ paths:
           required: true
           description: Aceptar entidad codificada con JSON
 components:
-  schemas: {}
+  schemas:
+    OnboardingRequest:
+      title: OnboardingRequest
+      type: object
+      properties:
+        id:
+          type: string
+        document_type_id:
+          type: string
   securitySchemes:
     Authorization:
       name: Token
@@ -339,3 +348,5 @@ components:
       description: 'Token Ãºnico de por vida entregado por Evertec al comercio '
 security:
   - API Key - 1: []
+tags:
+  - name: Onboarding Requests
