@@ -1,0 +1,340 @@
+openapi: 3.0.0
+info:
+  title: OnBoardingPanelApi
+  version: '1.0'
+  description: |
+    Servicio que  permite al comercio listar y ver detalle de las validaciones de identidad de sus clientes. 
+  contact:
+    name: Daniela RodrÃ­guez Higuita
+    email: daniela.rodriguez@evertecinc.com
+servers:
+  - url: 'http://onboarding.localhost/api'
+    description: onboarding.localhost
+paths:
+  /onboarding-requets:
+    get:
+      summary: Enlistar solicitudes de validaciÃ³n
+      tags: []
+      responses:
+        '200':
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: IdentificaciÃ³n de la solicitud
+                        document_type_id:
+                          type: integer
+                          description: |
+                            IdentificaciÃ³n del tipo de documento 
+                            1 = CÃ©dula de CiudadanÃ­a 
+                            2 = CÃ©dula de ExtranjerÃ­a
+                          enum:
+                            - 1
+                            - 2
+                        document:
+                          type: string
+                          description: Documento de identificaciÃ³n
+                        document_issue_date:
+                          type: string
+                          format: date
+                          description: Fecha de expediciÃ³n del documento
+                        names:
+                          type: string
+                          description: Nombres completos de la persona consultada
+                        surnames:
+                          type: string
+                          description: Apellidos completos de la persona consultada
+                        cellphone:
+                          type: string
+                          description: NÃºmero del celular de la persona consultada
+                        cellphone_country:
+                          type: string
+                          description: ISO 3166/2 cÃ³digo del paÃ­s del celular a consultar
+                        email:
+                          type: string
+                          description: Correo electrÃ³nico de la persona consulta
+                        device_channel:
+                          type: string
+                          enum:
+                            - BROWSER
+                            - APLICATION
+                            - UNDEFINED
+                          description: Medios por los cuales se realiza la solicitud
+                        device_fingerprint:
+                          type: array
+                          description: Huella digital del dispositivo desde el que se lleva a cabo el proceso de incorporaciÃ³n
+                          items: {}
+                        status:
+                          type: string
+                          description: Estado de la solicitud
+                          enum:
+                            - CREATED
+                            - PROCESSING
+                            - PARTIAL_COMPLETED
+                            - COMPLETED
+                            - FAILED
+                        status_message:
+                          type: string
+                          description: Mensaje asoacido con el estado de la solicitud
+                        reply_sent:
+                          description: Indica si la respuestaa fue enviada al comercio
+                          type: boolean
+                        response:
+                          type: array
+                          description: Resultado obtenido al validar la identidad consultada
+                          items: {}
+                        created_at:
+                          type: string
+                          format: date
+                          description: Fecha de creaciÃ³n de la solicitud de validaciÃ³n de identidad
+                  links:
+                    type: object
+                    description: NavegaciÃ³n de la paginaciÃ³n
+                    properties:
+                      self:
+                        type: string
+                      first:
+                        type: string
+                        description: Primera pÃ¡gina
+                      last:
+                        type: string
+                        description: Ãšltima pÃ¡gina
+                      next:
+                        type: string
+                        description: Siguiente pÃ¡gina
+                  meta:
+                    type: object
+                    description: 'InformaciÃ³n de las consultas '
+                    properties:
+                      current_page:
+                        type: string
+                        description: PÃ¡gina actual
+                      from:
+                        type: string
+                        description: 'Indica el nÃºmero de la solicitud inicial en la busqueda '
+                      last_page:
+                        type: string
+                        description: PÃ¡gina anterior
+                      path:
+                        type: string
+                        description: Ruta donde se realiza la consulta
+                      per_page:
+                        type: string
+                        description: Cantidad de solicitudes por pÃ¡gina
+                      to:
+                        type: string
+                        description: 'Indica el nÃºmero de la solicitud final en la busqueda '
+                      total:
+                        type: string
+                        description: Total de solicitudes
+              examples: {}
+      operationId: get-onboarding-requets
+      description: Enlistar y filtrar las solicitudes de validaciÃ³n de acuerdo a la identificaciÃ³n del comercio.
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: merchant_external_id
+          description: IdentificaciÃ³n Ãºnica e individual otorgada por Evertec al comercio.
+          required: true
+        - schema:
+            type: string
+            example: application/json
+          in: header
+          name: Accept
+          description: Aceptar entidad codificada con JSON
+          required: true
+        - schema:
+            type: integer
+          in: query
+          name: id
+          description: Identificador Ãºnico de la peticiÃ³n de validaciÃ³n de identidad
+        - schema:
+            type: string
+            minLength: 4
+            maxLength: 30
+          in: query
+          name: document
+          description: NumÃ©ro del documento de identidad a consultar
+        - schema:
+            type: string
+            minLength: 2
+            maxLength: 60
+            pattern: '/^[a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘ÃÃ‰ÃÃ“ÃšÃ„Ã‹ÃÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£][a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘ÃÃ‰ÃÃ“ÃšÃ„Ã‹ÃÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£\''\.\&\-\d ]{2,60}$/i'
+          in: query
+          name: names
+          description: Nombres de la persona a consultar
+        - schema:
+            type: string
+            minLength: 2
+            maxLength: 0
+            pattern: '/^[a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘ÃÃ‰ÃÃ“ÃšÃ„Ã‹ÃÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£][a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘ÃÃ‰ÃÃ“ÃšÃ„Ã‹ÃÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£\''\.\&\-\d ]{2,60}$/i'
+          in: query
+          name: surnames
+          description: Apellidos de la persona a consultar
+        - schema:
+            type: string
+            enum:
+              - CREATED
+              - PROCESSING
+              - COMPLETED
+              - PARTIAL_COMPLETED
+              - FAILED
+            example: FAILED
+          in: query
+          name: status
+          description: Estado final de la peticiÃ³n
+        - schema:
+            type: string
+            format: date
+            example: '2020-06-25'
+          in: query
+          name: created_at
+          description: Fecha de creaciÃ³n de la peticiÃ³n
+        - schema:
+            type: number
+          in: query
+          name: per_page
+          description: Cantidad de peticiones deseada por pÃ¡gina
+  '/onboarding-requests/{onBoardingRequestId}':
+    parameters:
+      - schema:
+          type: integer
+        name: onBoardingRequestId
+        in: path
+        required: true
+    get:
+      summary: detalle de una solicitud de validaciÃ³n
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Identificador de la peticiÃ³n
+                  document_type_id:
+                    type: integer
+                    description: |-
+                      Tipo de documento de identidad registrado por el cliente. 
+                      1 = CÃ©dula de CiudadanÃ­a
+                      2 = CÃ©dula de extrajerÃ­a
+                    enum:
+                      - 1
+                      - 2
+                  document:
+                    type: string
+                    description: NÃºmero del documento de identidad validado
+                  document_issue_date:
+                    type: string
+                    description: Fecha de expediciÃ³n del documento de identidad
+                    format: date
+                  names:
+                    type: string
+                    description: Nombres completos de la persona consultada
+                  surnames:
+                    type: string
+                    description: Apellidos completos de la persona consultada
+                  cellphone:
+                    type: string
+                    description: NÃºmero del celular de la persona consultada
+                  cellphone_country:
+                    type: string
+                    description: ISO 3166/2 CÃ³digo del paÃ­s del telÃ©fono celular
+                  email:
+                    type: string
+                    description: Correo electrÃ³nico de la persona consultada
+                  device_channel:
+                    type: string
+                    description: Medio por el cual se realiza la solicitud
+                    enum:
+                      - BROWSER
+                      - APPLICATION
+                      - UNDEFINED
+                  device_fingerprint:
+                    type: array
+                    description: Huella digital del dispositivo desde el que se lleva a cabo el proceso de incorporaciÃ³n
+                    items: {}
+                  status:
+                    type: string
+                    description: Estado final de la peticiÃ³n
+                    enum:
+                      - CREATED
+                      - PROCESSING
+                      - PARTIAL_COMPLETED
+                      - COMPLETED
+                      - FAILED
+                  status_messaget:
+                    description: Mensaje asociado con el estado de la peticiÃ³n
+                    type: string
+                  reply_sent:
+                    type: boolean
+                    description: Indica si la respuesta fue enviada al comercio
+                  response:
+                    type: array
+                    description: Resultado obtenido al validar la identidad de la persona
+                    items: {}
+                  created_at:
+                    type: string
+                    format: date
+                    description: Fecha de creaciÃ³n de la peticiÃ³n de validaciÃ³n
+                  services:
+                    type: array
+                    description: Contiene la informaciÃ³n de servicios que fueron consumidos en el proceso de validaciÃ³n de identidad segÃºn contrataciÃ³n con el comercio
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: IdentificaciÃ³n de la trazabilidad de la solicitud
+                        service:
+                          type: string
+                          description: Nombre del servicio consumido
+                        status:
+                          type: string
+                          description: Estado de procesamiento del servicio para la solicitud respectiva
+                          enum:
+                            - CREATED
+                            - PROCESSING
+                            - COMPLETED
+                            - FAILED
+                        inquiry:
+                          type: string
+                          description: InformaciÃ³n recuperada por los diferentes servicios de validaciÃ³n asociada a la persona quien realizÃ³ la solicitud
+                          enum:
+                            - SARLAFT
+                            - PERSONAL_INFORMATION
+      operationId: get-onboarding-requests-onBoardingRequest
+      description: Ver detalle de una solicitud de validaciÃ³n
+      parameters:
+        - schema:
+            type: string
+            default: application/json
+          in: header
+          name: Accept
+          required: true
+          description: Aceptar entidad codificada con JSON
+components:
+  schemas: {}
+  securitySchemes:
+    Authorization:
+      name: Token
+      type: apiKey
+      in: header
+      description: 'Token Ãºnico de por vida entregado por Evertec al comercio '
+security:
+  - API Key - 1: []
