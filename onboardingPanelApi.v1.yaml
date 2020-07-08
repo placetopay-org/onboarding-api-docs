@@ -11,9 +11,9 @@ servers:
   - url: 'http://onboarding.localhost/api'
     description: onboarding.localhost
 paths:
-  /onboarding-requets:
+  /onboarding-requests:
     get:
-      summary: Enlistar solicitudes de validaciÃ³n
+      summary: Index Onboarding Requests
       tags: []
       responses:
         '200':
@@ -170,7 +170,7 @@ paths:
             type: string
             minLength: 2
             maxLength: 60
-            pattern: '/^[a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘ÃÃ‰ÃÃ“ÃšÃ„Ã‹ÃÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£][a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘ÃÃ‰ÃÃ“ÃšÃ„Ã‹ÃÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£\''\.\&\-\d ]{2,60}$/i'
+            pattern: "/^[a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘Ã\x81Ã‰Ã\x8DÃ“ÃšÃ„Ã‹Ã\x8FÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£][a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘Ã\x81Ã‰Ã\x8DÃ“ÃšÃ„Ã‹Ã\x8FÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£\\'\\.\\&\\-\\d ]{2,60}$/i"
           in: query
           name: names
           description: Nombres de la persona a consultar
@@ -178,7 +178,7 @@ paths:
             type: string
             minLength: 2
             maxLength: 0
-            pattern: '/^[a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘ÃÃ‰ÃÃ“ÃšÃ„Ã‹ÃÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£][a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘ÃÃ‰ÃÃ“ÃšÃ„Ã‹ÃÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£\''\.\&\-\d ]{2,60}$/i'
+            pattern: "/^[a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘Ã\x81Ã‰Ã\x8DÃ“ÃšÃ„Ã‹Ã\x8FÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£][a-zÃ±Ã¡Ã©Ã­Ã³ÃºÃ¤Ã«Ã¯Ã¶Ã¼Ã Ã¨Ã¬Ã²Ã¹Ã‘Ã\x81Ã‰Ã\x8DÃ“ÃšÃ„Ã‹Ã\x8FÃ–ÃœÃ€ÃˆÃŒÃ’Ã™Ã‡Ã§ÃƒÃ£\\'\\.\\&\\-\\d ]{2,60}$/i"
           in: query
           name: surnames
           description: Apellidos de la persona a consultar
@@ -206,15 +206,16 @@ paths:
           in: query
           name: per_page
           description: Cantidad de peticiones deseada por pÃ¡gina
-  '/onboarding-requests/{onBoardingRequestId}':
+    parameters: []
+  '/onboarding-requests/{id}':
     parameters:
       - schema:
-          type: integer
-        name: onBoardingRequestId
+          type: string
+        name: id
         in: path
         required: true
     get:
-      summary: detalle de una solicitud de validaciÃ³n
+      summary: show
       tags: []
       responses:
         '200':
