@@ -270,6 +270,203 @@ paths:
           name: Content-Type
           description: application/json
           required: true
+  '/query/{id}':
+    parameters:
+      - schema:
+          type: integer
+          format: int64
+        name: id
+        in: path
+        required: true
+        description: |
+          Identificador de la petición
+    get:
+      summary: Servicio de consulta
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      summary:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            service_name:
+                              type: string
+                            service_status:
+                              type: string
+                            additional_data:
+                              type: object
+                              properties:
+                                generates_risk:
+                                  type: boolean
+                                contact_details:
+                                  type: object
+                                  properties:
+                                    email:
+                                      type: object
+                                      properties:
+                                        match:
+                                          type: boolean
+                                        confirmation_status:
+                                          type: string
+                                    mobile:
+                                      type: object
+                                      properties:
+                                        match:
+                                          type: boolean
+                                        confirmation_status:
+                                          type: string
+                                    person:
+                                      type: object
+                                      properties:
+                                        age_range:
+                                          type: string
+                                        percentage_match:
+                                          type: string
+                                    status:
+                                      type: string
+                                    document:
+                                      type: object
+                                      properties:
+                                        document_status:
+                                          type: number
+                                          minimum: 1
+                                        document_issue_date_match:
+                                          type: boolean
+                            continue_if_fails:
+                              type: boolean
+                      allow_access:
+                        type: boolean
+                      is_partial_response:
+                        type: boolean
+                  errors:
+                    type: string
+                  status:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      date:
+                        type: string
+                        format: date
+              examples:
+                Consulta exitosa:
+                  value:
+                    data:
+                      summary:
+                        - service_name: PERSONAL_INFORMATION
+                          service_status: COMPLETED
+                          additional_data:
+                            generates_risk: true
+                            contact_details:
+                              email:
+                                match: true
+                                confirmation_status: CONFIRMED
+                              mobile:
+                                match: true
+                                confirmation_status: SEND
+                              person:
+                                age_range: 25-30
+                                percentage_match: 14.29
+                              status: WITH_INFORMATION
+                              document:
+                                document_status: 1
+                                document_issue_date_match: true
+                          continue_if_fails: false
+                      allow_access: false
+                      is_partial_response: false
+                    errors: null
+                    status:
+                      status: OK
+                      reason: ''
+                      message: Consulta procesada satisfactoriamente
+                      date: '2020-08-03T19:06:59+00:00'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnBoardingRequestResponse'
+              examples:
+                Token erróneo o no envió de la cabecera authorization:
+                  value:
+                    data: null
+                    errors: null
+                    status:
+                      status: UNAUTHENTICATED
+                      reason: ''
+                      message: Estas credenciales no coinciden con nuestros registros.
+                      date: '2020-07-10T04:51:25+00:00'
+        '422':
+          description: Unprocessable Entity (WebDAV)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnBoardingRequestResponse'
+              examples:
+                Incumplimiento en la validación de los datos:
+                  value:
+                    data: null
+                    errors:
+                      identification:
+                        - identificación debe ser un número entero.
+                    status:
+                      status: FAILED
+                      reason: ''
+                      message: Los datos proporcionados no son válidos.
+                      date: '2020-08-04T19:40:44+00:00'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnBoardingRequestResponse'
+              examples:
+                example-1:
+                  value:
+                    data: null
+                    errors: null
+                    status:
+                      status: FAILED
+                      reason: ''
+                      message: ''
+                      date: '2020-08-04T19:56:53+00:00'
+      operationId: get-query-id
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Accept
+          required: true
+          description: |
+            Application/json
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          required: true
+          description: |
+            token provisto por Evertec-Placetopay
+        - schema:
+            type: string
+          in: header
+          name: Content-type
+          description: |
+            application/json
+          required: true
 components:
   schemas:
     OnBoardingRequestResponse:
