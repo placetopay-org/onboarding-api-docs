@@ -267,7 +267,7 @@ paths:
             type: string
           in: header
           name: Authorization
-          description: Bearer token_provisto_por_placetopay
+          description: Bearer token provisto por Evertec-Placetopay
           required: true
   '/onboarding-requests/{id}':
     parameters:
@@ -632,32 +632,50 @@ components:
           enum:
             - CO
           description: ISO 3166/2 código del país de la lìnea de celular
+        mobile_prefix:
+          type: string
+          description: Sucesión numérica que delimita el territorio al que pertenece la línea celular
         device_channel:
           type: string
           enum:
             - BROWSER
             - APPLICATION
-          description: |-
-            Identificador de la fuente de la petición de
-            autenticación de identidad (navegador web o app)
+            - UNDEFINED
+          description: |
+            Identificador de la fuente de la petición de autenticación de identidad(navegador web o app)
         device_fingerprint:
-          type: array
           description: Huella digital del dispositivo desde el que se lleva a cabo el proceso de incorporación
+          type: array
           items: {}
         status:
           type: string
           enum:
-            - FAILED
-            - COMPLETED
             - CREATED
             - PROCESSING
             - PARTIAL_COMPLETED
+            - COMPLETED
+            - FAILED
             - REJECTED_BY_EXCLUDED_LIST
           description: Estado de la solicitud
+        status_message:
+          type: string
+          description: Mensaje asociado al estado de la solicitud
+        locale:
+          type: string
+          description: Idioma en el que se debe procesar la solicitud
+          enum:
+            - es
+            - en
+        approval_url:
+          type: string
+          description: URL a la que será redirigido cuando se complete la validación y se permita el acceso
+        denial_url:
+          type: string
+          description: URL a la que será redirigido cuando se complete la validación y se deniegue el acceso
         created_at:
           type: string
+          description: Fecha de creación de la solicitud
           format: date
-          description: Fecha de creación
       required:
         - id
         - document_type
@@ -668,7 +686,15 @@ components:
         - email
         - mobile
         - mobile_country
+        - mobile_prefix
+        - device_channel
+        - device_fingerprint
         - status
+        - status_message
+        - locale
+        - approval_url
+        - denial_url
+        - created_at
     OnBoardingResponse:
       title: OnBoardingResponse
       type: object
