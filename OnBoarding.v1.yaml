@@ -1,0 +1,517 @@
+openapi: 3.0.0
+info:
+  title: Sistema de validación de identidad
+  version: '1.0'
+  description: 'El sistema de enrolamiento o  validación de identidad OnBoarding permite confirmar la identidad de una persona a partir de un conjunto de datos públicos y privados. Cuenta con  servicios para validar la información de la persona y la verificación del vínculo con el lavado de activos, financiación del terrorismo o si es una persona pública. Cuenta con medidas de seguridad como es el segundo factor de autenticación el cual verifica el acceso al correo y/o celular con el fin de reducir el riesgo de suplantación de terceros.  '
+  contact:
+    name: Jose Luis Rivera Ibarra
+    email: J.Rivera@evertecinc.com
+servers:
+  - url: 'https://dev.placetopay.com/onboarding/api'
+paths:
+  /onboarding:
+    post:
+      summary: Servicio OnBoarding
+      operationId: post-onboarding
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      request_id:
+                        description: |-
+                          El comercio debe almacenar en su sistema el identificador de la petición entregado en la
+                          respuesta (request_id), ya que una vez finalizada la validación de identidad se le notificará los resultados a través de un webhook provisto por el comercio, en esta notificación
+                          encontrará el identificador de la petición a la cual corresponde el resultado de la validación
+                        type: integer
+                      url:
+                        type: string
+                        description: url generada para activar el segundo factor de autenticación
+                  errors:
+                    type: string
+                  status:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum:
+                          - FAILED
+                          - COMPLETED
+                          - CREATED
+                          - PROCESSING
+                          - PARTIAL_COMPETED
+                          - REJECTED_BY_EXCLUDED_LIST
+                        description: Estado de la petición
+                      reason:
+                        type: string
+                        description: Entero que identifica la trazabilidad de la petición dentro del flujo de validación de identidad
+                      message:
+                        type: string
+                        description: Mensaje relacionado con el estado de la petición
+                      date:
+                        type: string
+                        format: date
+                        description: Fecha de creación formato ISO 8601
+              examples:
+                Exitosa creación de la solicitud:
+                  value:
+                    data:
+                      request_id: 19
+                      url: 'http://onboarding.localhost/validation/433938feb2d3ba11fd99763cd49cf04557453a95ef549e50a5850b886e219cfe'
+                    errors: null
+                    status:
+                      status: PENDING
+                      reason: '4'
+                      message: 'Identidad en el proceso de verificación, posiblemente le enviaremos un mensaje al correo electrónico y/o número de teléfono proporcionado'
+                      date: '2020-08-03T03:27:17+00:00'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnBoardingRequestResponse'
+              examples:
+                Token erróneo o no envió de la cabecera authorization:
+                  value:
+                    data: null
+                    errors: null
+                    status:
+                      status: UNAUTHENTICATED
+                      reason: ''
+                      message: Estas credenciales no coinciden con nuestros registros.
+                      date: '2020-05-31T17:56:30+00:00'
+        '422':
+          description: Unprocessable Entity (WebDAV)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnBoardingRequestResponse'
+              examples:
+                Incumplimiento en la validación de los datos:
+                  value:
+                    data: null
+                    errors:
+                      document_type:
+                        - El formato tipo de documento es inválido.
+                      document:
+                        - 'El documento no cumple con el formato establecido. Por favor, verificar el documento y tipo de documento.'
+                      document_issue_date:
+                        - fecha de expedición del documento no corresponde al formato Y-m-d.
+                      names:
+                        - El formato nombres es inválido.
+                      surnames:
+                        - El formato apellidos es inválido.
+                      cellphone:
+                        - El formato celular es inválido.
+                      email:
+                        - El correo electrónico es inválido.
+                    status:
+                      status: FAILED
+                      reason: ''
+                      message: Los datos proporcionados no son válidos.
+                      date: '2020-05-12T14:15:53+00:00'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnBoardingRequestResponse'
+              examples:
+                '500': null
+                Error durante el procesamiento de la petición enviada.  Se entrega una respuesta indicando que el proceso de validación de identidad no fue iniciado.:
+                  value:
+                    data: null
+                    errors: null
+                    status:
+                      status: FAILED
+                      reason: ''
+                      message: No fue posible iniciar el proceso de verificación. Vuelve a intentarlo más tarde
+                      date: '2020-08-03T03:32:17+00:00'
+      description: Las solicitudes POST reciben un cuerpo que debe estar codificado en JSON
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                person:
+                  type: object
+                  required:
+                    - document_type
+                    - document
+                    - document_issue_date
+                    - name
+                    - surname
+                    - email
+                    - mobile
+                  description: ''
+                  properties:
+                    document_type:
+                      type: string
+                      description: |-
+                        Tipo de documento 
+                        CC = Cédula de Ciudadanía 
+                        CE = Cédula de Extranjería
+                      enum:
+                        - CC
+                        - CE
+                    document:
+                      type: string
+                      description: |-
+                        Iniciales correspondiente con el tipo de
+                        documento
+                      pattern: 'CC => ''/^[1-9][0-9]{3,9}$/''  CE =>''/^([a-zA-Z]{1,5})?[1-9][0- 9]{3,7}$/'''
+                      maxLength: 30
+                      minLength: 1
+                    document_issue_date:
+                      type: string
+                      description: Fecha de expedición del documento(Y-m-d)
+                      format: date
+                    name:
+                      type: string
+                      description: Nombres completos
+                      pattern: '/^[a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜ ÀÈÌÒÙÇçÃã][a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜ ÀÈÌÒÙÇçÃã\''\.\&\-\d ]{2,60}$/i'
+                      maxLength: 60
+                      minLength: 1
+                    surname:
+                      type: string
+                      description: Apellidos completos
+                      pattern: '/^[a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜÀÈÌÒÙÇçÃã][a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜ ÀÈÌÒÙÇçÃã\''\.\&\-\d ]{2,60}$/i'
+                      minLength: 1
+                      maxLength: 60
+                    email:
+                      type: string
+                      minLength: 7
+                      maxLength: 150
+                      format: email
+                      description: Correo electrónico de contacto
+                    mobile:
+                      type: object
+                      required:
+                        - mobile
+                        - mobile_country
+                      description: ''
+                      properties:
+                        mobile:
+                          type: string
+                          description: Número de línea telefónica móvil
+                          pattern: '''/^\+?(57)?(\d{10})$/'''
+                          minLength: 1
+                          maxLength: 30
+                        mobile_prefix:
+                          type: string
+                          example: '57'
+                          description: Sucesión númerica que identifica la demarcación territorial al que pertene el usuario
+                        mobile_country:
+                          type: string
+                          description: ISO 3166/2 código del país de la lìnea de celular
+                          enum:
+                            - CO
+                locale:
+                  type: string
+                  description: |-
+                    Idioma
+                    es = Español 
+                    en = Ingles
+                  enum:
+                    - es
+                    - en
+                device_channel:
+                  type: string
+                  description: |-
+                    Identificador de la fuente de la petición de
+                    autenticación de identidad (navegador web o app)
+                  enum:
+                    - BROWSER
+                    - APPLICATION
+              required:
+                - person
+            examples:
+              example:
+                value:
+                  person:
+                    document_type: CC
+                    document: '117228238'
+                    document_issue_date: '2007-04-25'
+                    name: Vanesa
+                    surname: Restrepo
+                    email: test6@placetopay.com
+                    mobile:
+                      mobile: '3152364205'
+                      mobile_prefix: 57
+                      mobile_country: CO
+                  device_channel: BROWSER
+                  locale: es
+                  device_fingerprint:
+                    abc: 123
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          description: |
+            Bearer token provisto por Evertec-Placetopay
+          required: true
+        - schema:
+            type: string
+          in: header
+          name: Accept
+          description: application/json
+          required: true
+        - schema:
+            type: string
+          in: header
+          name: Content-Type
+          description: application/json
+          required: true
+  '/query/{id}':
+    parameters:
+      - schema:
+          type: integer
+          format: int64
+        name: id
+        in: path
+        required: true
+        description: Identificador de la petición
+    get:
+      summary: Servicio de consulta
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      summary:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            service_name:
+                              type: string
+                            service_status:
+                              type: string
+                            additional_data:
+                              type: object
+                              properties:
+                                generates_risk:
+                                  type: boolean
+                                contact_details:
+                                  type: object
+                                  properties:
+                                    email:
+                                      type: object
+                                      properties:
+                                        match:
+                                          type: boolean
+                                        confirmation_status:
+                                          type: string
+                                    mobile:
+                                      type: object
+                                      properties:
+                                        match:
+                                          type: boolean
+                                        confirmation_status:
+                                          type: string
+                                    person:
+                                      type: object
+                                      properties:
+                                        age_range:
+                                          type: string
+                                        percentage_match:
+                                          type: string
+                                    status:
+                                      type: string
+                                    document:
+                                      type: object
+                                      properties:
+                                        document_status:
+                                          type: number
+                                          minimum: 1
+                                        document_issue_date_match:
+                                          type: boolean
+                            continue_if_fails:
+                              type: boolean
+                      allow_access:
+                        type: boolean
+                      is_partial_response:
+                        type: boolean
+                  errors:
+                    type: string
+                  status:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      date:
+                        type: string
+                        format: date
+              examples:
+                Consulta exitosa:
+                  value:
+                    data:
+                      summary:
+                        - service_name: PERSONAL_INFORMATION
+                          service_status: COMPLETED
+                          additional_data:
+                            generates_risk: true
+                            contact_details:
+                              email:
+                                match: true
+                                confirmation_status: CONFIRMED
+                              mobile:
+                                match: true
+                                confirmation_status: SEND
+                              person:
+                                age_range: 25-30
+                                percentage_match: 14.29
+                              status: WITH_INFORMATION
+                              document:
+                                document_status: 1
+                                document_issue_date_match: true
+                          continue_if_fails: false
+                      allow_access: false
+                      is_partial_response: false
+                    errors: null
+                    status:
+                      status: OK
+                      reason: ''
+                      message: Consulta procesada satisfactoriamente
+                      date: '2020-08-03T19:06:59+00:00'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnBoardingRequestResponse'
+              examples:
+                Token erróneo o no envió de la cabecera authorization:
+                  value:
+                    data: null
+                    errors: null
+                    status:
+                      status: UNAUTHENTICATED
+                      reason: ''
+                      message: Estas credenciales no coinciden con nuestros registros.
+                      date: '2020-07-10T04:51:25+00:00'
+        '422':
+          description: Unprocessable Entity (WebDAV)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnBoardingRequestResponse'
+              examples:
+                Incumplimiento en la validación de los datos:
+                  value:
+                    data: null
+                    errors:
+                      identification:
+                        - identificación debe ser un número entero.
+                    status:
+                      status: FAILED
+                      reason: ''
+                      message: Los datos proporcionados no son válidos.
+                      date: '2020-08-04T19:40:44+00:00'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnBoardingRequestResponse'
+              examples:
+                example-1:
+                  value:
+                    data: null
+                    errors: null
+                    status:
+                      status: FAILED
+                      reason: ''
+                      message: ''
+                      date: '2020-08-04T19:56:53+00:00'
+      operationId: get-query-id
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: Accept
+          required: true
+          description: |
+            Application/json
+        - schema:
+            type: string
+          in: header
+          name: Authorization
+          required: true
+          description: |
+            token provisto por Evertec-Placetopay
+        - schema:
+            type: string
+          in: header
+          name: Content-type
+          description: |
+            application/json
+          required: true
+components:
+  schemas:
+    OnBoardingRequestResponse:
+      title: OnBoardingRequestResponse
+      type: object
+      description: 'El comercio debe almacenar en su sistema el identificador de la petición entregado en la respuesta (request_id), ya que una vez finalizada la validación de identidad se le notificará los resultados a través de un webhook provisto por el comercio, en esta notificación encontrará el identificador de la petición a la cual corresponde el resultado de la validación.'
+      properties:
+        data:
+          type: object
+          properties:
+            request_id:
+              type: integer
+              description: Identificador de la petición
+            url:
+              type: string
+              description: url generada para activar el segundo factor de autenticación
+        errors:
+          type: string
+        status:
+          type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - FAILED
+                - COMPLETED
+                - CREATED
+                - PROCESSING
+                - PARTIAL_COMPLETED
+                - REJECTED_BY_EXCLUDED_LIST
+              description: Estado de la petición
+            reason:
+              type: string
+              description: Entero que identifica la trazabilidad de la petición dentro del flujo de validación de identidad
+            message:
+              type: string
+              description: Mensaje relacionado con el estado de la petición
+            date:
+              type: string
+              description: Fecha de creación formato ISO 8601
+              format: date
+  securitySchemes:
+    Bearer ***************:
+      name: Authorization
+      type: apiKey
+      in: header
+      description: |-
+        Para autenticar una solicitud, se debe proporcionar el encabezado Authorization junto con el
+        valor Bearer seguido del token asignado al comercio.
