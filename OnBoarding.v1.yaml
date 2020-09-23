@@ -323,7 +323,7 @@ paths:
         description: |-
           Se requiere que sea enviado un conjunto de información publica y privada asociada a la identidad a validar. 
 
-          Para probar la api y poder simular varios de los posibles escenarios se deja a disposición un conjunto de credenciales donde cada una desencadena un escenario en particular, puede obtener más información en la siguiente sección Documentación/Identificaciones de prueba
+          Para probar la api y poder simular varios de los posibles escenarios se deja a disposición un conjunto de credenciales donde cada una desencadena un escenario en particular, puede obtener más información consulte el documento Identificaciones de prueba en la sección de documentación
       parameters:
         - schema:
             type: string
@@ -627,7 +627,10 @@ paths:
           name: Content-type
           description: ''
           required: true
-      description: 'Con esta solicitud GET podrá consultar el resultado de una validación de identidad previamente solicitada. '
+      description: |-
+        Con esta solicitud GET podrá consultar el resultado de una validación de identidad previamente solicitada. 
+
+        Recuerde que este servicio debe ser usado la menor cantidad de ocaciones posibles, para permitir el poco uso de este servicio, se notificara el resultado de la validación de identidad tan pronto este finalizada, para tener más información consulte el documento de Webhook en la sección de documentación
 components:
   schemas: {}
   securitySchemes:
