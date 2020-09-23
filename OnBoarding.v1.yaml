@@ -9,9 +9,9 @@ info:
 servers:
   - url: 'https://onboarding.placetopay.ws/api'
 paths:
-  /onboarding:
+  /request:
     post:
-      summary: Servicio OnBoarding
+      summary: Servicio de validación de identidad
       operationId: post-onboarding
       responses:
         '200':
@@ -23,11 +23,12 @@ paths:
                 properties:
                   data:
                     type: object
+                    minProperties: 2
+                    maxProperties: 2
                     required:
                       - request_id
                       - url
-                    minProperties: 2
-                    maxProperties: 2
+                    description: Detalle del resultado de procesar la solicitud de validación de identidad
                     properties:
                       request_id:
                         type: integer
@@ -42,7 +43,7 @@ paths:
                 required:
                   - data
               examples:
-                Exitosa creación de la solicitud:
+                Example:
                   value:
                     data:
                       request_id: 19
@@ -62,14 +63,51 @@ paths:
                 properties:
                   errors:
                     type: object
+                    minProperties: 1
+                    maxProperties: 1
+                    required:
+                      - message
+                    description: Detalle de los errores
                     properties:
                       message:
                         type: string
+                required:
+                  - errors
               examples:
-                No autenticado:
+                Example:
                   value:
                     errors:
-                      message: ''
+                      message: These credentials do not match our records.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+              required: true
+        '404':
+          description: La url a la que se esta solicitando la validación de identidad no existe
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    required:
+                      - message
+                    minProperties: 1
+                    maxProperties: 1
+                    description: Detalle de los errores
+                    properties:
+                      message:
+                        type: string
+                required:
+                  - errors
+              examples:
+                Example:
+                  value:
+                    errors:
+                      message: the requested resource is not defined
           headers:
             Content-Type:
               schema:
@@ -81,9 +119,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OnBoardingRequestResponse'
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    minProperties: 1
+                    description: Detalle de los errores
+                    properties:
+                      example:
+                        type: array
+                        minItems: 1
+                        description: Detalle puntual por cada campo y los errores que se identificaron
+                        items: {}
+                required:
+                  - errors
               examples:
-                La información enviada no es correcta:
+                Example:
                   value:
                     errors:
                       document_type:
@@ -111,9 +162,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OnBoardingRequestResponse'
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    required:
+                      - message
+                    minProperties: 1
+                    description: Detalle de los errores
+                    maxProperties: 1
+                    properties:
+                      message:
+                        type: string
+                required:
+                  - errors
               examples:
-                Error interno:
+                Example:
                   value:
                     errors:
                       message: ''
@@ -151,6 +215,7 @@ paths:
                       enum:
                         - CC
                         - CE
+                      example: CC
                     document:
                       type: string
                       description: |-
@@ -159,23 +224,26 @@ paths:
                       pattern: 'CC => ''/^[1-9][0-9]{3,9}$/''  CE =>''/^([a-zA-Z]{1,5})?[1-9][0- 9]{3,7}$/'''
                       maxLength: 30
                       minLength: 1
+                      example: '1061111110'
                     document_issue_date:
                       type: string
                       description: Fecha de expedición del documento (Y-m-d)
                       format: date
-                      example: '2020-04-31'
+                      example: '2020-04-30'
                     name:
                       type: string
                       description: Nombres completos
                       pattern: '/^[a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜ ÀÈÌÒÙÇçÃã][a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜ ÀÈÌÒÙÇçÃã\''\.\&\-\d ]{2,60}$/i'
                       maxLength: 60
                       minLength: 1
+                      example: Pedro Alberto
                     surname:
                       type: string
                       description: Apellidos completos
                       pattern: '/^[a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜÀÈÌÒÙÇçÃã][a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜ ÀÈÌÒÙÇçÃã\''\.\&\-\d ]{2,60}$/i'
                       minLength: 1
                       maxLength: 60
+                      example: Pérez Jiménez
                     email:
                       type: string
                       minLength: 7
@@ -203,6 +271,7 @@ paths:
                             - '57'
                             - '1'
                             - '593'
+                          example: '57'
                         mobile_country:
                           type: string
                           description: ISO 3166/2 código del país de la lìnea móvil
@@ -245,6 +314,8 @@ paths:
       parameters:
         - schema:
             type: string
+            example: Bearer 3|NYwOkAAPw7Onrcfz0nZCvuiB4W5OqO5xWaLYo1fDBiIRZx85WsEpmZ3BLIZFaVIkEW6do6oaDvJSLBIA
+            default: Bearer
           in: header
           name: Authorization
           description: |
@@ -252,16 +323,21 @@ paths:
           required: true
         - schema:
             type: string
+            default: application/json
           in: header
           name: Accept
-          description: application/json
+          description: Necesario para recibir las respuestas en el formato adecuado
           required: true
         - schema:
             type: string
+            default: application/json
           in: header
           name: Content-Type
-          description: application/json
+          description: ''
           required: true
+      tags:
+        - public
+    parameters: []
   '/query/{id}':
     parameters:
       - schema:
@@ -507,3 +583,5 @@ components:
       description: |-
         Para autenticar una solicitud, se debe proporcionar el encabezado Authorization junto con el
         valor Bearer seguido del token asignado al comercio.
+tags:
+  - name: public
