@@ -535,46 +535,7 @@ paths:
             application/json
           required: true
 components:
-  schemas:
-    OnBoardingRequestResponse:
-      title: OnBoardingRequestResponse
-      type: object
-      description: 'El comercio debe almacenar en su sistema el identificador de la petición entregado en la respuesta (request_id), ya que una vez finalizada la validación de identidad se le notificará los resultados a través de un webhook provisto por el comercio, en esta notificación encontrará el identificador de la petición a la cual corresponde el resultado de la validación.'
-      properties:
-        data:
-          type: object
-          properties:
-            request_id:
-              type: integer
-              description: Identificador de la petición
-            url:
-              type: string
-              description: url generada para activar el segundo factor de autenticación
-        errors:
-          type: string
-        status:
-          type: object
-          properties:
-            status:
-              type: string
-              enum:
-                - FAILED
-                - COMPLETED
-                - CREATED
-                - PROCESSING
-                - PARTIAL_COMPLETED
-                - REJECTED_BY_EXCLUDED_LIST
-              description: Estado de la petición
-            reason:
-              type: string
-              description: Entero que identifica la trazabilidad de la petición dentro del flujo de validación de identidad
-            message:
-              type: string
-              description: Mensaje relacionado con el estado de la petición
-            date:
-              type: string
-              description: Fecha de creación formato ISO 8601
-              format: date
+  schemas: {}
   securitySchemes:
     Bearer ***************:
       name: Authorization
