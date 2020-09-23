@@ -342,8 +342,6 @@ paths:
           name: Content-Type
           description: ''
           required: true
-      tags:
-        - public
     parameters: []
   '/query/{id}':
     parameters:
@@ -551,5 +549,4 @@ components:
       description: |-
         Para autenticar una solicitud, se debe proporcionar el encabezado Authorization junto con el
         valor Bearer seguido del token asignado al comercio.
-tags:
-  - name: public
+tags: []
