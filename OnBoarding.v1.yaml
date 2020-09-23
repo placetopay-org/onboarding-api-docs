@@ -205,6 +205,8 @@ paths:
                     - surname
                     - email
                     - mobile
+                  minProperties: 6
+                  maxProperties: 6
                   properties:
                     document_type:
                       type: string
@@ -256,6 +258,8 @@ paths:
                       required:
                         - mobile
                         - mobile_country
+                      minProperties: 2
+                      maxProperties: 3
                       properties:
                         mobile:
                           type: string
@@ -310,7 +314,10 @@ paths:
                   locale: es
                   device_fingerprint:
                     abc: 123
-        description: Se requiere que sea enviado un conjunto de información publica y privada asociada a la identidad a validar.
+        description: |-
+          Se requiere que sea enviado un conjunto de información publica y privada asociada a la identidad a validar. 
+
+          Para probar la api y poder simular varios de los posibles escenarios se deja a disposición un conjunto de credenciales donde cada una desencadena un escenario en particular, puede obtener más información en la siguiente sección docs/public/Identificaciones-de-prueba.md
       parameters:
         - schema:
             type: string
