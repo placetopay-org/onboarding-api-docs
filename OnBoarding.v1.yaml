@@ -2,20 +2,20 @@ openapi: 3.0.0
 info:
   title: Sistema de validación de identidad
   version: '1.0'
-  description: 'El sistema de enrolamiento o  validación de identidad OnBoarding permite confirmar la identidad de una persona a partir de un conjunto de datos públicos y privados. Cuenta con  servicios para validar la información de la persona y la verificación del vínculo con el lavado de activos, financiación del terrorismo o si es una persona pública. Cuenta con medidas de seguridad como es el segundo factor de autenticación el cual verifica el acceso al correo y/o celular con el fin de reducir el riesgo de suplantación de terceros.  '
+  description: 'El sistema de enrolamiento o validación de identidad OnBoarding permite confirmar la identidad de una persona a partir de un conjunto de datos públicos y privados. Se compone de diferentes servicios como validación de información personal, validación en listas restrictivas y validación biométrica. Además Cuenta con medidas de seguridad como es el segundo factor de autenticación el cual verifica el acceso al correo y/o celular con el fin de reducir el riesgo de suplantación de terceros.'
   contact:
     name: Jose Luis Rivera Ibarra
     email: J.Rivera@evertecinc.com
 servers:
-  - url: 'https://dev.placetopay.com/onboarding/api'
+  - url: 'https://onboarding.placetopay.ws/api'
 paths:
-  /onboarding:
+  /request:
     post:
-      summary: Servicio OnBoarding
-      operationId: post-onboarding
+      summary: Servicio de validación de identidad
+      operationId: post-request
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Validación de identidad iniciada
           content:
             application/json:
               schema:
@@ -23,79 +23,123 @@ paths:
                 properties:
                   data:
                     type: object
+                    minProperties: 2
+                    maxProperties: 2
+                    required:
+                      - request_id
+                      - url
+                    description: Detalle del resultado de procesar la solicitud de validación de identidad
                     properties:
                       request_id:
-                        description: |-
-                          El comercio debe almacenar en su sistema el identificador de la petición entregado en la
-                          respuesta (request_id), ya que una vez finalizada la validación de identidad se le notificará los resultados a través de un webhook provisto por el comercio, en esta notificación
-                          encontrará el identificador de la petición a la cual corresponde el resultado de la validación
                         type: integer
+                        description: |-
+                          Identificador de la solicitud de validación de identidad. El comercio debe almacenar en su sistema el identificador, ya que una vez finalizada la validación de identidad se le notificará los resultados a través de un webhook provisto por el comercio, en esta notificación
+                          encontrará el identificador de la petición a la cual corresponde el resultado.
+                        minimum: 1
                       url:
                         type: string
-                        description: url generada para activar el segundo factor de autenticación
-                  errors:
-                    type: string
-                  status:
-                    type: object
-                    properties:
-                      status:
-                        type: string
-                        enum:
-                          - FAILED
-                          - COMPLETED
-                          - CREATED
-                          - PROCESSING
-                          - PARTIAL_COMPETED
-                          - REJECTED_BY_EXCLUDED_LIST
-                        description: Estado de la petición
-                      reason:
-                        type: string
-                        description: Entero que identifica la trazabilidad de la petición dentro del flujo de validación de identidad
-                      message:
-                        type: string
-                        description: Mensaje relacionado con el estado de la petición
-                      date:
-                        type: string
-                        format: date
-                        description: Fecha de creación formato ISO 8601
+                        description: url generada donde se debe redireccionar al usuario abriendo una nueva pestaña en el navegador o dentro de un iframe
+                        format: uri
+                required:
+                  - data
               examples:
-                Exitosa creación de la solicitud:
+                Example:
                   value:
                     data:
                       request_id: 19
-                      url: 'http://onboarding.localhost/validation/433938feb2d3ba11fd99763cd49cf04557453a95ef549e50a5850b886e219cfe'
-                    errors: null
-                    status:
-                      status: PENDING
-                      reason: '4'
-                      message: 'Identidad en el proceso de verificación, posiblemente le enviaremos un mensaje al correo electrónico y/o número de teléfono proporcionado'
-                      date: '2020-08-03T03:27:17+00:00'
+                      url: 'https://onboarding.placetopay.ws/validation/50?signature=eb9dc748c05be76884d012714d0614d3d863efc17348faeb6379807e40fb0606'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                default: application/json
+              description: ''
+              required: true
         '401':
-          description: Unauthorized
+          description: Token erróneo o no enviado en la cabecera authorization
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OnBoardingRequestResponse'
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    minProperties: 1
+                    maxProperties: 1
+                    description: Detalle de los errores
+                    required:
+                      - message
+                    properties:
+                      message:
+                        type: string
+                        default: These credentials do not match our records.
+                required:
+                  - errors
               examples:
-                Token erróneo o no envió de la cabecera authorization:
+                Example:
                   value:
-                    data: null
-                    errors: null
-                    status:
-                      status: UNAUTHENTICATED
-                      reason: ''
-                      message: Estas credenciales no coinciden con nuestros registros.
-                      date: '2020-05-31T17:56:30+00:00'
+                    errors:
+                      message: These credentials do not match our records.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                default: application/json
+              description: ''
+              required: true
+        '404':
+          description: No existe la url a la que se esta solicitando la validación de identidad
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    required:
+                      - message
+                    minProperties: 1
+                    maxProperties: 1
+                    description: Detalle de los errores
+                    properties:
+                      message:
+                        type: string
+                required:
+                  - errors
+              examples:
+                Example:
+                  value:
+                    errors:
+                      message: the requested resource is not defined
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                default: application/json
+              description: ''
+              required: true
         '422':
-          description: Unprocessable Entity (WebDAV)
+          description: Los datos requeridos no se han enviado en su totalidad o alguno de estos no cumple con la estructura esperada
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OnBoardingRequestResponse'
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    minProperties: 1
+                    description: Detalle de los errores
+                    properties:
+                      example:
+                        type: array
+                        minItems: 1
+                        description: Detalle puntual por cada campo y los errores que se identificaron
+                        items: {}
+                required:
+                  - errors
               examples:
-                Incumplimiento en la validación de los datos:
+                Example:
                   value:
-                    data: null
                     errors:
                       document_type:
                         - El formato tipo de documento es inválido.
@@ -111,29 +155,45 @@ paths:
                         - El formato celular es inválido.
                       email:
                         - El correo electrónico es inválido.
-                    status:
-                      status: FAILED
-                      reason: ''
-                      message: Los datos proporcionados no son válidos.
-                      date: '2020-05-12T14:15:53+00:00'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                default: application/json
+              description: ''
+              required: true
         '500':
-          description: Internal Server Error
+          description: Error durante el procesamiento de la petición enviada.  Se entrega una respuesta indicando que el proceso de validación de identidad no fue iniciado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OnBoardingRequestResponse'
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    required:
+                      - message
+                    minProperties: 1
+                    description: Detalle de los errores
+                    maxProperties: 1
+                    properties:
+                      message:
+                        type: string
+                required:
+                  - errors
               examples:
-                '500': null
-                Error durante el procesamiento de la petición enviada.  Se entrega una respuesta indicando que el proceso de validación de identidad no fue iniciado.:
+                Example:
                   value:
-                    data: null
-                    errors: null
-                    status:
-                      status: FAILED
-                      reason: ''
-                      message: No fue posible iniciar el proceso de verificación. Vuelve a intentarlo más tarde
-                      date: '2020-08-03T03:32:17+00:00'
-      description: Las solicitudes POST reciben un cuerpo que debe estar codificado en JSON
+                    errors:
+                      message: ''
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                default: application/json
+              description: ''
+              required: true
+      description: 'Con esta solicitud POST podrá iniciar una validación de identidad. Las validaciones realizadas están asociadas a los módulos activados en la configuración del panel, para la credenciales de prueba se cuenta con la activación de los siguientes servicios; validación de información personal, segundo factor de autenticación y validación en listas restrictivas.'
       requestBody:
         content:
           application/json:
@@ -142,6 +202,7 @@ paths:
               properties:
                 person:
                   type: object
+                  description: ''
                   required:
                     - document_type
                     - document
@@ -150,7 +211,8 @@ paths:
                     - surname
                     - email
                     - mobile
-                  description: ''
+                  minProperties: 6
+                  maxProperties: 6
                   properties:
                     document_type:
                       type: string
@@ -161,6 +223,7 @@ paths:
                       enum:
                         - CC
                         - CE
+                      example: CC
                     document:
                       type: string
                       description: |-
@@ -169,22 +232,26 @@ paths:
                       pattern: 'CC => ''/^[1-9][0-9]{3,9}$/''  CE =>''/^([a-zA-Z]{1,5})?[1-9][0- 9]{3,7}$/'''
                       maxLength: 30
                       minLength: 1
+                      example: '1061111110'
                     document_issue_date:
                       type: string
-                      description: Fecha de expedición del documento(Y-m-d)
+                      description: Fecha de expedición del documento (Y-m-d)
                       format: date
+                      example: '2020-04-30'
                     name:
                       type: string
                       description: Nombres completos
                       pattern: '/^[a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜ ÀÈÌÒÙÇçÃã][a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜ ÀÈÌÒÙÇçÃã\''\.\&\-\d ]{2,60}$/i'
                       maxLength: 60
                       minLength: 1
+                      example: Pedro Alberto
                     surname:
                       type: string
                       description: Apellidos completos
                       pattern: '/^[a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜÀÈÌÒÙÇçÃã][a- zñáéíóúäëïöüàèìòùÑÁÉÍÓÚÄËÏÖÜ ÀÈÌÒÙÇçÃã\''\.\&\-\d ]{2,60}$/i'
                       minLength: 1
                       maxLength: 60
+                      example: Pérez Jiménez
                     email:
                       type: string
                       minLength: 7
@@ -193,10 +260,12 @@ paths:
                       description: Correo electrónico de contacto
                     mobile:
                       type: object
+                      description: ''
                       required:
                         - mobile
                         - mobile_country
-                      description: ''
+                      minProperties: 2
+                      maxProperties: 3
                       properties:
                         mobile:
                           type: string
@@ -206,34 +275,35 @@ paths:
                           maxLength: 30
                         mobile_prefix:
                           type: string
-                          example: '57'
                           description: Sucesión númerica que identifica la demarcación territorial al que pertene el usuario
+                          default: '57'
+                          enum:
+                            - '57'
+                            - '1'
+                            - '593'
+                          example: '57'
                         mobile_country:
                           type: string
-                          description: ISO 3166/2 código del país de la lìnea de celular
+                          description: ISO 3166/2 código del país de la lìnea móvil
                           enum:
                             - CO
+                            - US
+                            - EC
+                          default: CO
                 locale:
                   type: string
                   description: |-
-                    Idioma
+                    Idioma en el que se muestra los textos durante la validación
                     es = Español 
                     en = Ingles
                   enum:
                     - es
                     - en
-                device_channel:
-                  type: string
-                  description: |-
-                    Identificador de la fuente de la petición de
-                    autenticación de identidad (navegador web o app)
-                  enum:
-                    - BROWSER
-                    - APPLICATION
+                  default: en
               required:
                 - person
             examples:
-              example:
+              Example:
                 value:
                   person:
                     document_type: CC
@@ -250,9 +320,15 @@ paths:
                   locale: es
                   device_fingerprint:
                     abc: 123
+        description: |-
+          Se requiere que sea enviado un conjunto de información publica y privada asociada a la identidad a validar. 
+
+          Para probar la api y poder simular varios de los posibles escenarios se deja a disposición un conjunto de credenciales donde cada una desencadena un escenario en particular, puede obtener más información consulte el documento Identificaciones de prueba en la sección de documentación
       parameters:
         - schema:
             type: string
+            example: Bearer 3|NYwOkAAPw7Onrcfz0nZCvuiB4W5OqO5xWaLYo1fDBiIRZx85WsEpmZ3BLIZFaVIkEW6do6oaDvJSLBIA
+            default: Bearer
           in: header
           name: Authorization
           description: |
@@ -260,31 +336,33 @@ paths:
           required: true
         - schema:
             type: string
+            default: application/json
           in: header
           name: Accept
-          description: application/json
+          description: Necesario para recibir las respuestas en el formato adecuado
           required: true
         - schema:
             type: string
+            default: application/json
           in: header
           name: Content-Type
-          description: application/json
+          description: ''
           required: true
-  '/query/{id}':
+    parameters: []
+  '/query/{request_id}':
     parameters:
       - schema:
-          type: integer
-          format: int64
-        name: id
+          type: string
+        name: request_id
         in: path
         required: true
-        description: Identificador de la petición
+        description: identificador devuelto en la respuesta al solicitar una validación de identidad
     get:
       summary: Servicio de consulta
       tags: []
       responses:
         '200':
-          description: OK
+          description: Se consulta una validación que se encuentra finalizada y que ademas puede ser consultada debido a que quien la consulta fue quien la creo
           content:
             application/json:
               schema:
@@ -295,165 +373,248 @@ paths:
                     properties:
                       summary:
                         type: array
+                        description: Resumen de la validación realizada y los servicios ejecutados
+                        minItems: 1
                         items:
                           type: object
+                          description: 'Información sobre un servicio ejecutado '
+                          minProperties: 4
+                          maxProperties: 5
                           properties:
                             service_name:
                               type: string
+                              description: Nombre del servicio
+                              enum:
+                                - TFA
+                                - SRALAFT
+                                - PERSONAL_INFORMATION
                             service_status:
                               type: string
+                              enum:
+                                - PROCESSING
+                                - COMPLETED
+                                - FAILED
+                              description: Estado en el que se encuentra el servicio
+                            score:
+                              type: number
+                              description: Puntuación obtenida para el servicio tras finalizar la consulta (no aplica para todos los servicios)
+                              format: float
+                              minimum: 0
+                              maximum: 100
+                              example: 89.67
                             additional_data:
                               type: object
+                              description: Información adicional para obtener más contexto sobre lo encontrado al realizar la consulta en el servicio
+                              minProperties: 2
                               properties:
                                 generates_risk:
                                   type: boolean
-                                contact_details:
+                                  description: Indica si los resultados obtenidos por el servicio arrojan alertas para la identidad consultada
+                                details:
                                   type: object
-                                  properties:
-                                    email:
-                                      type: object
-                                      properties:
-                                        match:
-                                          type: boolean
-                                        confirmation_status:
-                                          type: string
-                                    mobile:
-                                      type: object
-                                      properties:
-                                        match:
-                                          type: boolean
-                                        confirmation_status:
-                                          type: string
-                                    person:
-                                      type: object
-                                      properties:
-                                        age_range:
-                                          type: string
-                                        percentage_match:
-                                          type: string
-                                    status:
-                                      type: string
-                                    document:
-                                      type: object
-                                      properties:
-                                        document_status:
-                                          type: number
-                                          minimum: 1
-                                        document_issue_date_match:
-                                          type: boolean
+                                  description: Resumen de lo obtenido por el servicio (la estructura interna varia de acuerdo a cada servicio o proveedor)
                             continue_if_fails:
                               type: boolean
+                              description: Indica si el cliente configuro no detener una validación si el servicio falla al realizar una consulta en este
                       allow_access:
                         type: boolean
+                        description: Indica si al finalizar la validación se sugiere permitir el acceso al usuario lo cual sucede si ningún servicio genera alertas
                       is_partial_response:
                         type: boolean
-                  errors:
-                    type: string
-                  status:
-                    type: object
-                    properties:
-                      status:
-                        type: string
-                      reason:
-                        type: string
-                      message:
-                        type: string
-                      date:
-                        type: string
-                        format: date
+                        description: Indica si algún servicio presento fallas y por ende se entrega una respuesta parcial sujeta a cambios cuando el servicio fallido se encuentre activo de nuevo
+                      score:
+                        type: number
+                        minimum: 0
+                        maximum: 100
+                        example: 89.67
+                        description: Puntuación obtenida tras finalizar la validación la identidad
+                required:
+                  - data
               examples:
-                Consulta exitosa:
+                Example:
                   value:
                     data:
+                      score_name: 84.23
+                      allow_access: false
+                      is_partial_response: false
                       summary:
                         - service_name: PERSONAL_INFORMATION
                           service_status: COMPLETED
                           additional_data:
                             generates_risk: true
                             contact_details:
-                              email:
-                                match: true
-                                confirmation_status: CONFIRMED
-                              mobile:
-                                match: true
-                                confirmation_status: SEND
                               person:
-                                age_range: 25-30
-                                percentage_match: 14.29
+                                age_range: null
+                                score_name: 24
                               status: WITH_INFORMATION
                               document:
                                 document_status: 1
                                 document_issue_date_match: true
+                              contact_data:
+                                email:
+                                  match: true
+                                  score: 68.49
+                                mobile:
+                                  match: false
+                                  score: 0
                           continue_if_fails: false
-                      allow_access: false
-                      is_partial_response: false
-                    errors: null
-                    status:
-                      status: OK
-                      reason: ''
-                      message: Consulta procesada satisfactoriamente
-                      date: '2020-08-03T19:06:59+00:00'
+                        - service_name: SARLAFT
+                          service_status: COMPLETED
+                          additional_data:
+                            report_assets:
+                              list: false
+                              news: false
+                              peps: false
+                            generates_risk: false
+                          continue_if_fails: false
+                        - service_name: TFA
+                          service_status: COMPLETED
+                          additional_data:
+                            detail:
+                              email:
+                                match: true
+                                confirmation_status: CONFIRMED
+                              mobile:
+                                match: false
+                                confirmation_status: null
+                            generates_risk: false
+                          continue_if_fails: false
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                default: application/json
+              required: true
+        '204':
+          description: Se consulta una validación que se encuentra en proceso o que no puede ser consultada debido a que quien la consulta no fue quien la creo
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                default: application/json
+              required: true
         '401':
-          description: Unauthorized
+          description: Token erróneo o no enviado en la cabecera authorization
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OnBoardingRequestResponse'
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    required:
+                      - message
+                    minProperties: 1
+                    maxProperties: 1
+                    properties:
+                      message:
+                        type: string
+                        default: These credentials do not match our records.
+                required:
+                  - errors
               examples:
-                Token erróneo o no envió de la cabecera authorization:
+                Example:
                   value:
-                    data: null
-                    errors: null
-                    status:
-                      status: UNAUTHENTICATED
-                      reason: ''
-                      message: Estas credenciales no coinciden con nuestros registros.
-                      date: '2020-07-10T04:51:25+00:00'
+                    errors:
+                      message: These credentials do not match our records.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                default: application/json
+              required: true
+        '404':
+          description: No existe la url a la que se consultando el resultado de validación de identidad
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    required:
+                      - message
+                    minProperties: 1
+                    maxProperties: 1
+                    properties:
+                      message:
+                        type: string
+                        default: the requested resource is not defined
+                required:
+                  - errors
+              examples:
+                Example:
+                  value:
+                    errors:
+                      message: the requested resource is not defined
         '422':
-          description: Unprocessable Entity (WebDAV)
+          description: Se consulta una validación que no existe o el request_id no cumple con el tipo de dato o formato esperado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OnBoardingRequestResponse'
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    required:
+                      - identification
+                    minProperties: 1
+                    maxProperties: 1
+                    properties:
+                      identification:
+                        type: array
+                        minItems: 1
+                        items: {}
+                required:
+                  - errors
               examples:
-                Incumplimiento en la validación de los datos:
+                Example:
                   value:
-                    data: null
                     errors:
                       identification:
-                        - identificación debe ser un número entero.
-                    status:
-                      status: FAILED
-                      reason: ''
-                      message: Los datos proporcionados no son válidos.
-                      date: '2020-08-04T19:40:44+00:00'
+                        - The selected identification is invalid.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                default: application/json
+              required: true
         '500':
-          description: Internal Server Error
+          description: Error durante el procesamiento de la petición enviada.  Se entrega una respuesta indicando que la consulta no pudo se realizada
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OnBoardingRequestResponse'
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    required:
+                      - message
+                    minProperties: 1
+                    maxProperties: 1
+                    properties:
+                      message:
+                        type: string
+                required:
+                  - errors
               examples:
-                example-1:
+                Example:
                   value:
-                    data: null
-                    errors: null
-                    status:
-                      status: FAILED
-                      reason: ''
+                    errors:
                       message: ''
-                      date: '2020-08-04T19:56:53+00:00'
-      operationId: get-query-id
+      operationId: get-query-request_id
       parameters:
         - schema:
             type: string
+            default: Application/json
           in: header
           name: Accept
           required: true
-          description: |
-            Application/json
+          description: Necesario para recibir las respuestas en el formato adecuado
         - schema:
             type: string
+            default: Bearer
+            example: Bearer 3|NYwOkAAPw7Onrcfz0nZCvuiB4W5OqO5xWaLYo1fDBiIRZx85WsEpmZ3BLIZFaVIkEW6do6oaDvJSLBIA
           in: header
           name: Authorization
           required: true
@@ -461,52 +622,17 @@ paths:
             token provisto por Evertec-Placetopay
         - schema:
             type: string
+            default: Application/json
           in: header
           name: Content-type
-          description: |
-            application/json
+          description: ''
           required: true
+      description: |-
+        Con esta solicitud GET podrá consultar el resultado de una validación de identidad previamente solicitada. 
+
+        Recuerde que este servicio debe ser usado la menor cantidad de ocaciones posibles, para permitir el poco uso de este servicio, se notificara el resultado de la validación de identidad tan pronto este finalizada, para tener más información consulte el documento de Webhook en la sección de documentación
 components:
-  schemas:
-    OnBoardingRequestResponse:
-      title: OnBoardingRequestResponse
-      type: object
-      description: 'El comercio debe almacenar en su sistema el identificador de la petición entregado en la respuesta (request_id), ya que una vez finalizada la validación de identidad se le notificará los resultados a través de un webhook provisto por el comercio, en esta notificación encontrará el identificador de la petición a la cual corresponde el resultado de la validación.'
-      properties:
-        data:
-          type: object
-          properties:
-            request_id:
-              type: integer
-              description: Identificador de la petición
-            url:
-              type: string
-              description: url generada para activar el segundo factor de autenticación
-        errors:
-          type: string
-        status:
-          type: object
-          properties:
-            status:
-              type: string
-              enum:
-                - FAILED
-                - COMPLETED
-                - CREATED
-                - PROCESSING
-                - PARTIAL_COMPLETED
-                - REJECTED_BY_EXCLUDED_LIST
-              description: Estado de la petición
-            reason:
-              type: string
-              description: Entero que identifica la trazabilidad de la petición dentro del flujo de validación de identidad
-            message:
-              type: string
-              description: Mensaje relacionado con el estado de la petición
-            date:
-              type: string
-              description: Fecha de creación formato ISO 8601
-              format: date
+  schemas: {}
   securitySchemes:
     Bearer ***************:
       name: Authorization
@@ -515,3 +641,4 @@ components:
       description: |-
         Para autenticar una solicitud, se debe proporcionar el encabezado Authorization junto con el
         valor Bearer seguido del token asignado al comercio.
+tags: []
