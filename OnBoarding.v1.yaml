@@ -2,12 +2,12 @@ openapi: 3.0.0
 info:
   title: Sistema de validación de identidad
   version: '1.0'
-  description: 'El sistema de enrolamiento o  validación de identidad OnBoarding permite confirmar la identidad de una persona a partir de un conjunto de datos públicos y privados. Cuenta con  servicios para validar la información de la persona y la verificación del vínculo con el lavado de activos, financiación del terrorismo o si es una persona pública. Cuenta con medidas de seguridad como es el segundo factor de autenticación el cual verifica el acceso al correo y/o celular con el fin de reducir el riesgo de suplantación de terceros.  '
+  description: 'El sistema de enrolamiento o validación de identidad OnBoarding permite confirmar la identidad de una persona a partir de un conjunto de datos públicos y privados. Se compone de diferentes servicios como validación de información personal, validación en listas restrictivas y validación biométrica. Además Cuenta con medidas de seguridad como es el segundo factor de autenticación el cual verifica el acceso al correo y/o celular con el fin de reducir el riesgo de suplantación de terceros.'
   contact:
     name: Jose Luis Rivera Ibarra
     email: J.Rivera@evertecinc.com
 servers:
-  - url: 'https://dev.placetopay.com/onboarding/api'
+  - url: 'https://onboarding.placetopay.ws/api'
 paths:
   /onboarding:
     post:
@@ -15,7 +15,7 @@ paths:
       operationId: post-onboarding
       responses:
         '200':
-          description: OK
+          description: Validación de identidad iniciada
           content:
             application/json:
               schema:
@@ -23,79 +23,68 @@ paths:
                 properties:
                   data:
                     type: object
+                    required:
+                      - request_id
+                      - url
+                    minProperties: 2
+                    maxProperties: 2
                     properties:
                       request_id:
-                        description: |-
-                          El comercio debe almacenar en su sistema el identificador de la petición entregado en la
-                          respuesta (request_id), ya que una vez finalizada la validación de identidad se le notificará los resultados a través de un webhook provisto por el comercio, en esta notificación
-                          encontrará el identificador de la petición a la cual corresponde el resultado de la validación
                         type: integer
+                        description: |-
+                          Identificador de la solicitud de validación de identidad. El comercio debe almacenar en su sistema el identificador, ya que una vez finalizada la validación de identidad se le notificará los resultados a través de un webhook provisto por el comercio, en esta notificación
+                          encontrará el identificador de la petición a la cual corresponde el resultado.
+                        minimum: 1
                       url:
                         type: string
-                        description: url generada para activar el segundo factor de autenticación
-                  errors:
-                    type: string
-                  status:
-                    type: object
-                    properties:
-                      status:
-                        type: string
-                        enum:
-                          - FAILED
-                          - COMPLETED
-                          - CREATED
-                          - PROCESSING
-                          - PARTIAL_COMPETED
-                          - REJECTED_BY_EXCLUDED_LIST
-                        description: Estado de la petición
-                      reason:
-                        type: string
-                        description: Entero que identifica la trazabilidad de la petición dentro del flujo de validación de identidad
-                      message:
-                        type: string
-                        description: Mensaje relacionado con el estado de la petición
-                      date:
-                        type: string
-                        format: date
-                        description: Fecha de creación formato ISO 8601
+                        description: url generada donde se debe redireccionar al usuario abriendo una nueva pestaña en el navegador o dentro de un iframe
+                        format: uri
+                required:
+                  - data
               examples:
                 Exitosa creación de la solicitud:
                   value:
                     data:
                       request_id: 19
-                      url: 'http://onboarding.localhost/validation/433938feb2d3ba11fd99763cd49cf04557453a95ef549e50a5850b886e219cfe'
-                    errors: null
-                    status:
-                      status: PENDING
-                      reason: '4'
-                      message: 'Identidad en el proceso de verificación, posiblemente le enviaremos un mensaje al correo electrónico y/o número de teléfono proporcionado'
-                      date: '2020-08-03T03:27:17+00:00'
+                      url: 'https://onboarding.placetopay.ws/validation/50?signature=eb9dc748c05be76884d012714d0614d3d863efc17348faeb6379807e40fb0606'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+              required: true
         '401':
-          description: Unauthorized
+          description: Token erróneo o no enviado en la cabecera authorization
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OnBoardingRequestResponse'
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      message:
+                        type: string
               examples:
-                Token erróneo o no envió de la cabecera authorization:
+                No autenticado:
                   value:
-                    data: null
-                    errors: null
-                    status:
-                      status: UNAUTHENTICATED
-                      reason: ''
-                      message: Estas credenciales no coinciden con nuestros registros.
-                      date: '2020-05-31T17:56:30+00:00'
+                    errors:
+                      message: ''
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+              required: true
         '422':
-          description: Unprocessable Entity (WebDAV)
+          description: Los datos requeridos no se han enviado en su totalidad o alguno de estos no cumple con la estructura esperada
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OnBoardingRequestResponse'
               examples:
-                Incumplimiento en la validación de los datos:
+                La información enviada no es correcta:
                   value:
-                    data: null
                     errors:
                       document_type:
                         - El formato tipo de documento es inválido.
@@ -111,29 +100,30 @@ paths:
                         - El formato celular es inválido.
                       email:
                         - El correo electrónico es inválido.
-                    status:
-                      status: FAILED
-                      reason: ''
-                      message: Los datos proporcionados no son válidos.
-                      date: '2020-05-12T14:15:53+00:00'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+              required: true
         '500':
-          description: Internal Server Error
+          description: Error durante el procesamiento de la petición enviada.  Se entrega una respuesta indicando que el proceso de validación de identidad no fue iniciado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OnBoardingRequestResponse'
               examples:
-                '500': null
-                Error durante el procesamiento de la petición enviada.  Se entrega una respuesta indicando que el proceso de validación de identidad no fue iniciado.:
+                Error interno:
                   value:
-                    data: null
-                    errors: null
-                    status:
-                      status: FAILED
-                      reason: ''
-                      message: No fue posible iniciar el proceso de verificación. Vuelve a intentarlo más tarde
-                      date: '2020-08-03T03:32:17+00:00'
-      description: Las solicitudes POST reciben un cuerpo que debe estar codificado en JSON
+                    errors:
+                      message: ''
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: application/json
+              required: true
+      description: 'Con esta solicitud POST podrá iniciar una validación de identidad. Las validaciones realizadas están asociadas a los módulos activados en la configuración del panel, para la credenciales de prueba se cuenta con la activación de los siguientes servicios; validación de información personal, segundo factor de autenticación y validación en listas restrictivas.'
       requestBody:
         content:
           application/json:
@@ -142,6 +132,7 @@ paths:
               properties:
                 person:
                   type: object
+                  description: ''
                   required:
                     - document_type
                     - document
@@ -150,7 +141,6 @@ paths:
                     - surname
                     - email
                     - mobile
-                  description: ''
                   properties:
                     document_type:
                       type: string
@@ -171,8 +161,9 @@ paths:
                       minLength: 1
                     document_issue_date:
                       type: string
-                      description: Fecha de expedición del documento(Y-m-d)
+                      description: Fecha de expedición del documento (Y-m-d)
                       format: date
+                      example: '2020-04-31'
                     name:
                       type: string
                       description: Nombres completos
@@ -193,10 +184,10 @@ paths:
                       description: Correo electrónico de contacto
                     mobile:
                       type: object
+                      description: ''
                       required:
                         - mobile
                         - mobile_country
-                      description: ''
                       properties:
                         mobile:
                           type: string
@@ -206,34 +197,34 @@ paths:
                           maxLength: 30
                         mobile_prefix:
                           type: string
-                          example: '57'
                           description: Sucesión númerica que identifica la demarcación territorial al que pertene el usuario
+                          default: '57'
+                          enum:
+                            - '57'
+                            - '1'
+                            - '593'
                         mobile_country:
                           type: string
-                          description: ISO 3166/2 código del país de la lìnea de celular
+                          description: ISO 3166/2 código del país de la lìnea móvil
                           enum:
                             - CO
+                            - US
+                            - EC
+                          default: CO
                 locale:
                   type: string
                   description: |-
-                    Idioma
+                    Idioma en el que se muestra los textos durante la validación
                     es = Español 
                     en = Ingles
                   enum:
                     - es
                     - en
-                device_channel:
-                  type: string
-                  description: |-
-                    Identificador de la fuente de la petición de
-                    autenticación de identidad (navegador web o app)
-                  enum:
-                    - BROWSER
-                    - APPLICATION
+                  default: en
               required:
                 - person
             examples:
-              example:
+              Example:
                 value:
                   person:
                     document_type: CC
@@ -250,6 +241,7 @@ paths:
                   locale: es
                   device_fingerprint:
                     abc: 123
+        description: Se requiere que sea enviado un conjunto de información publica y privada asociada a la identidad a validar.
       parameters:
         - schema:
             type: string
