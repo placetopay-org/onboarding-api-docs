@@ -4,7 +4,7 @@ Una vez finalizada la validación de identidad se realizará una notificación m
 
 Dentro de la notificación se encontraran la siguientes llaves:
 
-#### requet_id
+#### request_id
 el identificador de la petición a la cual se está respondiendo, el cual coincidirá con el retornado cuando se solicitó la validación de identidad.
 
 #### allow_access
@@ -17,7 +17,7 @@ un valor booleano que indica si esta respuesta es la definitiva o es una respues
 valor numérico entre 0 y 100 que define la calificación obtenida al finalizar el proceso de validación de identidad.
 
 #### summary
-el resumen de los resultados obtenidos al realizar las distintas validaciones y se compone por varios grupos que representan cada uno de las validaciones realizadas y el estado de estas.
+el resumen de los resultados obtenidos al realizar las distintas validaciones y se compone por varios grupos que representan cada una de las validaciones realizadas y el estado de estas.
 
 #### signature
 firma que permite validar que la fuente sea confiable. El token provisto al comercio se debe cifrar usando el algoritmo sha256 (la salida serán dígitos hexadecimales en minúsculas) y la salida debe coincidir con la firma enviada.
@@ -29,33 +29,36 @@ firma que permite validar que la fuente sea confiable. El token provisto al come
   "request_id": 3,
   "allow_access": true,
   "is_partial_response": false
-  "score": 84.59,
+  "score": 74.73,
   "summary": [
     {
       "service_name": "PERSONAL_INFORMATION",
       "service_status": "COMPLETED",
       "additional_data": {
-          "generates_risk": true,
-          "contact_details": {
-              "person": {
-                  "age_range": null,
-                  "score_name": 24
-              },
-              "status": "WITH_INFORMATION",
-              "document": {
-                  "document_status": 1,
-                  "document_issue_date_match": true
-              },
-              "contact_data": {
-                  "email": {
-                      "match": true,
-                      "score": 68.49
+          "generates_risk": false,
+          "details": {
+              "score": 74.73,
+                  "details": {
+                      "person": {
+                          "age_range": null,
+                          "score_name": 100
+                      },
+                      "status": "WITH_INFORMATION",
+                      "document": {
+                          "document_status": 1,
+                          "document_issue_date_match": true
+                      },
+                      "contact_data": {
+                          "email": {
+                              "match": true,
+                              "score": 68.41
+                          },
+                          "mobile": {
+                              "match": true,
+                              "score": 63.39
+                          }
+                      }
                   },
-                  "mobile": {
-                      "match": true,
-                      "score": 63.5
-                  }
-              }
           }
       },
       "continue_if_fails": false
@@ -64,7 +67,7 @@ firma que permite validar que la fuente sea confiable. El token provisto al come
       "service_name": "SARLAFT",
       "service_status": "COMPLETED",
       "additional_data": {
-          "report_assets": {
+          "details": {
               "list": false,
               "news": false,
               "peps": false
@@ -77,23 +80,38 @@ firma que permite validar que la fuente sea confiable. El token provisto al come
       "service_name": "TFA",
       "service_status": "COMPLETED",
       "additional_data": {
-          "detail": {
+          "details": {
               "email": {
                   "match": true,
                   "confirmation_status": "EXPIRED"
               },
               "mobile": {
                   "match": true,
-                  "confirmation_status": "EXPIRED"
+                  "confirmation_status": "CONFIRMED"
               }
           },
-          "generates_risk": true
+          "generates_risk": false
       },
       "continue_if_fails": false
     }    
   ],
   "signature":
 "224b5fadc653bd6361d2198090a49c15cfd6e416579cd9b5cd5048e78b842a0b"
+}
+```
+
+## Respuesta:
+Para confirmar la recepción de la respuesta, su terminal debe responder en formato json con un cuerpo que contiene una llave status y un valor RECIVED, ademas el código de estado HTTP debe estar en el rango de 2xx. Todos los códigos de respuesta fuera de este rango, incluidos los códigos 3xx, indicaran que no se recibió la respuesta.
+
+Si no se recibe un código de estado HTTP 2xx, se repite el intento de notificación durante el transcurso del día, En caso de obtener una respuesta en el rango de los 4xx y 5xx se marca la notificación como fallida y deja de intentar enviarlo a su punto final y se envía un correo electrónico sobre el punto final mal configurado.
+
+Debido a que es muy importante confirmar la recepción de la notificación de webhook, su punto final debe devolver un código de estado HTTP 2xx antes de cualquier lógica compleja que pueda causar un tiempo de espera.
+
+#### Ejemplo de la respuesta
+
+```
+{
+  "status": "RECEIVED",
 }
 ```
 
