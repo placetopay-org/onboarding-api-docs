@@ -203,6 +203,8 @@ paths:
                 person:
                   type: object
                   description: ''
+                  minProperties: 6
+                  maxProperties: 6
                   required:
                     - document_type
                     - document
@@ -211,8 +213,6 @@ paths:
                     - surname
                     - email
                     - mobile
-                  minProperties: 6
-                  maxProperties: 6
                   properties:
                     document_type:
                       type: string
@@ -261,11 +261,11 @@ paths:
                     mobile:
                       type: object
                       description: ''
+                      minProperties: 2
+                      maxProperties: 3
                       required:
                         - mobile
                         - mobile_country
-                      minProperties: 2
-                      maxProperties: 3
                       properties:
                         mobile:
                           type: string
@@ -300,6 +300,14 @@ paths:
                     - es
                     - en
                   default: en
+                approval_url:
+                  type: string
+                  format: uri
+                  description: url donde se debe redireccionar si el resultado de la validación de identidad indica que no se encontraron alertas
+                denial_url:
+                  type: string
+                  format: uri
+                  description: url donde se debe redireccionar si el resultado de la validación de identidad indica que se encontraron alertas
               required:
                 - person
             examples:
