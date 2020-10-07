@@ -200,7 +200,12 @@ paths:
                 default: application/json
               description: ''
               required: true
-      description: 'Con esta solicitud POST podrá iniciar una validación de identidad. Las validaciones realizadas están asociadas a los módulos activados en la configuración del panel, para la credenciales de prueba se cuenta con la activación de los siguientes servicios; validación de información personal, segundo factor de autenticación y validación en listas restrictivas.'
+      description: |-
+        Con esta solicitud POST podrá iniciar una validación de identidad. Las validaciones realizadas están asociadas a los módulos activados en la configuración del panel.
+
+        Si la solicitud de validación de identidad se realiza correctamente, se recomienda hacer uso de la siguiente [librería](https://www.npmjs.com/package/@placetopay/iframe-on-boarding) para abrir dentro de un iframe la url donde se da continuidad a la validación de identidad.
+
+        **Nota:** Las credenciales de prueba cuentan con la activación de los siguientes servicios; validación de información personal, segundo factor de autenticación y validación en listas restrictivas.
       requestBody:
         content:
           application/json:
