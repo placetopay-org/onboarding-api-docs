@@ -2,7 +2,14 @@ openapi: 3.0.0
 info:
   title: Sistema de validación de identidad
   version: '1.0'
-  description: 'El sistema de enrolamiento o validación de identidad OnBoarding permite confirmar la identidad de una persona a partir de un conjunto de datos públicos y privados. Se compone de diferentes servicios como validación de información personal, validación en listas restrictivas y validación biométrica. Además Cuenta con medidas de seguridad como es el segundo factor de autenticación el cual verifica el acceso al correo y/o celular con el fin de reducir el riesgo de suplantación de terceros.'
+  description: |-
+    El sistema de enrolamiento o validación de identidad OnBoarding permite confirmar la identidad de una persona a partir de un conjunto de datos públicos y privados. Se compone de diferentes servicios como validación de información personal, validación en listas restrictivas y validación biométrica. Además Cuenta con medidas de seguridad como es el segundo factor de autenticación el cual verifica el acceso al correo y/o celular con el fin de reducir el riesgo de suplantación de terceros.
+
+    Nota: las URLs listadas en la sección de servers a continuación son sandbox, lo que indica que se encuentran en ambientes de prueba y experimentación. Sobre estos ambientes se prueban
+    las soluciones tecnológicas antes de ser liberada a un ambiente de producción. Los datos
+    de este ambiente no son reales.
+
+    Si requiere las URLs para las APIs en producción póngase en contacto con el equipo de Placetopay.
   contact:
     name: Jose Luis Rivera Ibarra
     email: J.Rivera@evertecinc.com
