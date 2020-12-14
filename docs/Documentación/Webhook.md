@@ -40,21 +40,24 @@ firma que permite validar que la fuente sea confiable. El token provisto al come
               "score": 74.73,
                   "details": {
                       "person": {
+                          "name": {
+                                "match": "WITH_SAFE_COINCIDENCE",
+                                "score": 100
+                          },
                           "age_range": null,
-                          "score_name": 100
                       },
                       "status": "WITH_INFORMATION",
                       "document": {
-                          "document_status": 1,
-                          "document_issue_date_match": true
+                          "document_issue_date_match": true,
+                          "document_with_valid_status": true
                       },
                       "contact_data": {
                           "email": {
-                              "match": true,
+                              "match": "WITH_SAFE_COINCIDENCE",
                               "score": 68.41
                           },
                           "mobile": {
-                              "match": true,
+                              "match": "WITH_SAFE_COINCIDENCE",
                               "score": 63.39
                           }
                       }
