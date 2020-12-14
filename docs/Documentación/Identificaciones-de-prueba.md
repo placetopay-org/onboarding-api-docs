@@ -8,18 +8,24 @@ Documentos de identidad y respectivo flujo habilitados en el mock
 
 -   **1061111110** Todos los servicios en estado completado y sin generar riesgo, además con generación de 2fa.
 
--   **1061111111** Todos los servicios en estado completado y sin generar riesgo, además con generación de 2fa pero el sms no se logra enviar.
+-   **1061111111** Todos los servicios en estado completado con alguna coincidencia en listas o peps para el servicio de sarlaft, además con generación de 2fa pero el sms no se logra enviar.
 
 -   **1061111112** Todos los servicios en estado completado, pero sin generar 2fa (los datos de contacto no coinciden).
 
 -   **1061111113** Con algún servicio fallido, además con generación de 2fa.
 
--   **1061111114** Todos los servicios en estado completado con alguna coincidencia en listas o peps para el servicio de sarlaft, además con generación de 2fa.
+-   **1061111114** Con algún servicio fallido, además con generación de 2fa.
 
--   **1061111115** Todos los servicios en estado completado y sin generar riesgo, además con generación de 2fa unicamente mediante sms.
+-   **1061111115** Con algún servicio fallido, además con generación de 2fa.
 
--   **1061111116** Todos los servicios en estado completado y sin generar riesgo, además con generación de 2fa unicamente mediante email.
+-   **1061111116** Con algún servicio fallido, además con generación de 2fa.
 
--   **1061111117** Todos los servicios en estado completado pero no se encontraron coincidencias en centrales de riesgo.
+-   **1061111117** Todos los servicios en estado completado con alguna coincidencia en listas o peps para el servicio de sarlaft, además con generación de 2fa.
+
+-   **1061111123** Todos los servicios en estado completado y sin generar riesgo, además con generación de 2fa unicamente mediante sms.
+
+-   **1061111124** Todos los servicios en estado completado y sin generar riesgo, además con generación de 2fa unicamente mediante email.
+
+-   **1061111125** Todos los servicios en estado completado pero no se encontraron coincidencias en centrales de riesgo.
 
 **Nota:** cualquier otro documento enviado tendra el comportamiento del documento **1061111110** que es el comportamiento por defecto
