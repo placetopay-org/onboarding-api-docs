@@ -12,13 +12,15 @@ Documentos de identidad y respectivo flujo habilitados en el mock
 
 -   **1061111112** Todos los servicios en estado completado, pero sin generar 2fa (los datos de contacto no coinciden).
 
--   **1061111113** Con el servicio de sarlaft fallido, además con generación de 2fa.
+-   **1061111113** Reservada para pruebas internas, por favor no usar.
 
--   **1061111114** Con el servicio de sarlaft fallido, pero sin generar 2fa (los datos de contacto no coinciden).
+-   **1061111114** Reservada para pruebas internas, por favor no usar.
 
--   **1061111115** Con el servicio de sarlaft fallido, además con generación de 2fa únicamente mediante sms
+-   **1061111115** Reservada para pruebas internas, por favor no usar.
 
--   **1061111116** Con el servicio de sarlaft fallido, además con generación de 2fa únicamente mediante email.
+-   **1061111116** Reservada para pruebas internas, por favor no usar.
+    
+-   **1061111118** Reservada para pruebas internas, por favor no usar.
 
 -   **1061111119** Todos los servicios en estado completado, pero la identificaciòn proporcionada pertenece a una persona fallecida.
 
