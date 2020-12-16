@@ -8,7 +8,7 @@ Documentos de identidad y respectivo flujo habilitados en el mock
 
 -   **1061111110** Todos los servicios en estado completado y sin generar riesgo, además con generación de 2fa.
 
--   **1061111111** Todos los servicios en estado completado con coincidencia en listas, peps  y noticiaspara el servicio de sarlaft, además con generación de 2fa únicamente mediante email. !!
+-   **1061111111** Todos los servicios en estado completado con coincidencia en listas, peps  y noticiaspara el servicio de sarlaft, además con generación de 2fa únicamente mediante email.
 
 -   **1061111112** Todos los servicios en estado completado, pero sin generar 2fa (los datos de contacto no coinciden).
 
