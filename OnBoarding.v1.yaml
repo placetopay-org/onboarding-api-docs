@@ -22,7 +22,7 @@ paths:
       operationId: post-request
       responses:
         '201':
-          description: Validación de identidad iniciada
+          description: Esta respuesta indica que la validación de identidad fue iniciada
           content:
             application/json:
               schema:
@@ -63,7 +63,17 @@ paths:
               description: ''
               required: true
         '401':
-          description: Token erróneo o no enviado en la cabecera authorization
+          description: |-
+            Esta respuesta indica que hay problemas con la autenticación
+
+            Posibles causas:
+            - El token es erróneo
+            - No se esta enviado en la cabecera authorization
+
+
+            Nota:
+
+            Recuerde que el valor del la cabecera autorizacion debe empezar siempre con BEARER + el token provisto
           content:
             application/json:
               schema:
@@ -95,7 +105,11 @@ paths:
               description: ''
               required: true
         '404':
-          description: No existe la url a la que se esta solicitando la validación de identidad
+          description: |-
+            Esta respuesta indica que no existe la url a la que se esta solicitando la validación de identidad
+
+            Posibles causas:
+            - la url del webservice esta mal escrita
           content:
             application/json:
               schema:
@@ -125,8 +139,45 @@ paths:
                 default: application/json
               description: ''
               required: true
+        '405':
+          description: 'Esta respuesta indica que el metodo HTTP (GET, POST, etc..) usado al momento de realizar la petición no es el correcto'
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    required:
+                      - message
+                    minProperties: 1
+                    maxProperties: 1
+                    description: Detalle de los errores
+                    properties:
+                      message:
+                        type: string
+                        minLength: 1
+                required:
+                  - errors
+          headers:
+            Content-Type:
+              schema:
+                type: string
         '422':
-          description: Los datos requeridos no se han enviado en su totalidad o alguno de estos no cumple con la estructura esperada
+          description: |-
+            Esta respuesta indica que alguno de los campo no se envió o diligencio correctamente
+
+            Posibles causas:
+            - Algún campo no cumple con la estructura, esto se presenta la mayoria de veces con los emails y URLs
+            - El documento y tipo de documento no son consitentes
+            - Algún campo obligatorio no se diligencio o no se envió
+            - No se envió la cabecera Content-Type con el valor de application/json
+
+
+            Nota:
+
+            Recuerde que en la presente documentación se indica los campo obligatorios, así como los tipos de datos de estos y si aplica la espresión regular usada para su validación
           content:
             application/json:
               schema:
@@ -170,7 +221,7 @@ paths:
               description: ''
               required: true
         '500':
-          description: Error durante el procesamiento de la petición enviada.  Se entrega una respuesta indicando que el proceso de validación de identidad no fue iniciado
+          description: 'Esta respuesta indica que ocurrio un error no soportado durante el procesamiento de la petición enviada, por lo anterior el proceso de validación de identidad no fue iniciado'
           content:
             application/json:
               schema:
@@ -514,7 +565,15 @@ paths:
                 default: application/json
               required: true
         '401':
-          description: Token erróneo o no enviado en la cabecera authorization
+          description: |-
+            Esta respuesta indica que hay problemas con la autenticación
+
+            Posibles causas:
+            El token es erróneo
+            No se esta enviado en la cabecera authorization
+
+            Nota:
+            Recuerde que el valor del la cabecera autorizacion debe empezar siempre con BEARER + el token provisto
           content:
             application/json:
               schema:
