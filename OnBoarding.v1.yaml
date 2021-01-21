@@ -66,14 +66,12 @@ paths:
           description: |-
             Esta respuesta indica que hay problemas con la autenticación
 
-            Posibles causas:
+            #### Posibles causas:
             - El token es erróneo
             - No se esta enviado en la cabecera authorization
 
-
-            Nota:
-
-            Recuerde que el valor del la cabecera autorizacion debe empezar siempre con BEARER + el token provisto
+            #### Nota:
+            Recuerde que el valor del la cabecera autorizacion debe empezar siempre con Bearer + el token provisto
           content:
             application/json:
               schema:
@@ -106,10 +104,10 @@ paths:
               required: true
         '404':
           description: |-
-            Esta respuesta indica que no existe la url a la que se esta solicitando la validación de identidad
+            Esta respuesta indica que no existe la URL a la que se esta solicitando la validación de identidad
 
-            Posibles causas:
-            - la url del webservice esta mal escrita
+            #### Posibles causas:
+            - la URL del webservice esta mal escrita
           content:
             application/json:
               schema:
@@ -140,7 +138,7 @@ paths:
               description: ''
               required: true
         '405':
-          description: 'Esta respuesta indica que el metodo HTTP (GET, POST, etc..) usado al momento de realizar la petición no es el correcto'
+          description: 'Esta respuesta indica que el método HTTP (GET, POST, etc..) usado al momento de realizar la petición no es el correcto'
           content:
             application/json:
               schema:
@@ -168,16 +166,14 @@ paths:
           description: |-
             Esta respuesta indica que alguno de los campo no se envió o diligencio correctamente
 
-            Posibles causas:
-            - Algún campo no cumple con la estructura, esto se presenta la mayoria de veces con los emails y URLs
-            - El documento y tipo de documento no son consitentes
+            #### Posibles causas:
+            - Algún campo no cumple con la estructura, esto se presenta la mayoría de veces con los emails y URLs
+            - El documento y tipo de documento no son consistentes
             - Algún campo obligatorio no se diligencio o no se envió
             - No se envió la cabecera Content-Type con el valor de application/json
 
-
-            Nota:
-
-            Recuerde que en la presente documentación se indica los campo obligatorios, así como los tipos de datos de estos y si aplica la espresión regular usada para su validación
+            #### Nota:
+            Recuerde que en la presente documentación se indica los campo obligatorios, así como los tipos de datos de estos y si aplica la expresión regular usada para su validación
           content:
             application/json:
               schema:
@@ -221,7 +217,7 @@ paths:
               description: ''
               required: true
         '500':
-          description: 'Esta respuesta indica que ocurrio un error no soportado durante el procesamiento de la petición enviada, por lo anterior el proceso de validación de identidad no fue iniciado'
+          description: 'Esta respuesta indica que ocurrió un error no soportado durante el procesamiento de la petición enviada, por lo anterior el proceso de validación de identidad no fue iniciado'
           content:
             application/json:
               schema:
@@ -433,7 +429,7 @@ paths:
       tags: []
       responses:
         '200':
-          description: Se consulta una validación que se encuentra finalizada y que ademas puede ser consultada debido a que quien la consulta fue quien la creo
+          description: Esta respuesta indica que la validación de identidad se encuentra finalizada y que se entrega el resumen de la validación con su respectivo resultado
           content:
             application/json:
               schema:
@@ -557,7 +553,12 @@ paths:
                 default: application/json
               required: true
         '204':
-          description: Se consulta una validación que se encuentra en proceso o que no puede ser consultada debido a que quien la consulta no fue quien la creo
+          description: |-
+            Esta respuesta indica que no se tiene información a mostrar respecto a la validación de identidad consultada
+
+            #### Posibles causas:
+            - La validación de identidad aún se encuentra en proceso
+            - La validación de identidad no puede ser consultada debido a que quien se encuentra consultándola no es quien solicito la realización de esta
           headers:
             Content-Type:
               schema:
@@ -568,12 +569,12 @@ paths:
           description: |-
             Esta respuesta indica que hay problemas con la autenticación
 
-            Posibles causas:
-            El token es erróneo
-            No se esta enviado en la cabecera authorization
+            #### Posibles causas:
+            - El token es erróneo
+            - No se esta enviado en la cabecera authorization
 
-            Nota:
-            Recuerde que el valor del la cabecera autorizacion debe empezar siempre con BEARER + el token provisto
+            #### Nota:
+            Recuerde que el valor del la cabecera autorizacion debe empezar siempre con Bearer + el token provisto
           content:
             application/json:
               schema:
@@ -581,14 +582,16 @@ paths:
                 properties:
                   errors:
                     type: object
-                    required:
-                      - message
                     minProperties: 1
                     maxProperties: 1
+                    required:
+                      - message
+                    description: Detalle de los errores
                     properties:
                       message:
                         type: string
                         default: These credentials do not match our records.
+                        description: ''
                 required:
                   - errors
               examples:
@@ -603,7 +606,11 @@ paths:
                 default: application/json
               required: true
         '404':
-          description: No existe la url a la que se consultando el resultado de validación de identidad
+          description: |-
+            Esta respuesta indica que no existe la URL a la que se esta solicitando la validación de identidad
+
+            #### Posibles causas:
+            - la URL del webservice esta mal escrita
           content:
             application/json:
               schema:
@@ -611,10 +618,11 @@ paths:
                 properties:
                   errors:
                     type: object
-                    required:
-                      - message
                     minProperties: 1
                     maxProperties: 1
+                    required:
+                      - message
+                    description: Detalle de los errores
                     properties:
                       message:
                         type: string
@@ -626,8 +634,43 @@ paths:
                   value:
                     errors:
                       message: the requested resource is not defined
+          headers:
+            Content-Type:
+              schema:
+                type: string
+        '405':
+          description: 'Esta respuesta indica que el método HTTP (GET, POST, etc..) usado al momento de realizar la petición no es el correcto'
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    required:
+                      - message
+                    minProperties: 1
+                    maxProperties: 1
+                    description: Detalle de los errores
+                    properties:
+                      message:
+                        type: string
+                        minLength: 1
+                required:
+                  - errors
+          headers:
+            Content-Type:
+              schema:
+                type: string
         '422':
-          description: Se consulta una validación que no existe o el request_id no cumple con el tipo de dato o formato esperado
+          description: |-
+            Esta respuesta indica que no es posible procesar la solicitud debido a problemas el identificador de la validación de identidad
+
+            #### Posibles causas:
+            - El request_id enviado no se encuentra asociado a una validación de identidad
+            - El request_id enviado no cumple con el tipo de dato o formato esperado
+            - No se envió el request_id
           content:
             application/json:
               schema:
@@ -635,10 +678,11 @@ paths:
                 properties:
                   errors:
                     type: object
-                    required:
-                      - identification
                     minProperties: 1
                     maxProperties: 1
+                    required:
+                      - identification
+                    description: Detalle de los errores
                     properties:
                       identification:
                         type: array
@@ -659,7 +703,7 @@ paths:
                 default: application/json
               required: true
         '500':
-          description: Error durante el procesamiento de la petición enviada.  Se entrega una respuesta indicando que la consulta no pudo se realizada
+          description: 'Esta respuesta indica que ocurrió un error no soportado durante el procesamiento de la petición enviada, por lo anterior no es posible entregar el detalle de la validación de identidad'
           content:
             application/json:
               schema:
@@ -667,10 +711,11 @@ paths:
                 properties:
                   errors:
                     type: object
-                    required:
-                      - message
                     minProperties: 1
                     maxProperties: 1
+                    required:
+                      - message
+                    description: Detalle de los errores
                     properties:
                       message:
                         type: string
@@ -681,6 +726,10 @@ paths:
                   value:
                     errors:
                       message: ''
+          headers:
+            Content-Type:
+              schema:
+                type: string
       operationId: get-query-request_id
       parameters:
         - schema:
