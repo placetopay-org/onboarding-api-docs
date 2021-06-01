@@ -391,8 +391,7 @@ paths:
       parameters:
         - schema:
             type: string
-            example: Bearer 3|NYwOkAAPw7Onrcfz0nZCvuiB4W5OqO5xWaLYo1fDBiIRZx85WsEpmZ3BLIZFaVIkEW6do6oaDvJSLBIA
-            default: Bearer
+            example: NYwOkAAPw7Onrcfz0nZCvuiB4W5OqO5xWaLYo1fDBiIRZx85WsEpmZ3BLIZFaVIkEW6do6oaDvJSLBIA
           in: header
           name: Api-key
           description: token provisto por Evertec-Placetopay
@@ -403,13 +402,13 @@ paths:
           in: header
           name: Accept
           required: true
-          description: application/json
+          description: Necesario para recibir las respuestas en el formato adecuado
         - schema:
             type: string
             default: application/json
           in: header
           name: Content-Type
-          description: application/json
+          description: Necesario para procesar los datos enviados
           required: true
     parameters: []
   '/query/{request_id}':
@@ -725,11 +724,10 @@ paths:
           in: header
           name: Accept
           required: true
-          description: application/json
+          description: Necesario para recibir las respuestas en el formato adecuado
         - schema:
             type: string
-            default: Bearer
-            example: Bearer 3|NYwOkAAPw7Onrcfz0nZCvuiB4W5OqO5xWaLYo1fDBiIRZx85WsEpmZ3BLIZFaVIkEW6do6oaDvJSLBIA
+            example: NYwOkAAPw7Onrcfz0nZCvuiB4W5OqO5xWaLYo1fDBiIRZx85WsEpmZ3BLIZFaVIkEW6do6oaDvJSLBIA
           in: header
           name: Api-key
           required: true
@@ -740,7 +738,7 @@ paths:
             default: Application/json
           in: header
           name: Content-type
-          description: application/json
+          description: Necesario para procesar los datos enviados
           required: true
       description: |-
         Con esta solicitud GET podrá consultar el resultado de una validación de identidad previamente solicitada. 
