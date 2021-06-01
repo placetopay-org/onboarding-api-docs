@@ -14,7 +14,7 @@ info:
     name: Jose Luis Rivera Ibarra
     email: J.Rivera@evertecinc.com
 servers:
-  - url: 'https://onboarding.placetopay.ws/api'
+  - url: 'https://onboarding-dev.placetopay.ws/api'
 paths:
   /request:
     post:
@@ -747,8 +747,8 @@ paths:
 components:
   schemas: {}
   securitySchemes:
-    Bearer ***************:
-      name: Authorization
+    '***************':
+      name: Api-key
       type: apiKey
       in: header
       description: |-
