@@ -465,18 +465,14 @@ paths:
                                 - COMPLETED
                                 - FAILED
                               description: Estado en el que se encuentra el servicio
-                            score:
-                              type: number
-                              description: Puntuación obtenida para el servicio tras finalizar la consulta (no aplica para todos los servicios)
-                              format: float
-                              minimum: 0
-                              maximum: 100
-                              example: 89.67
                             additional_data:
                               type: object
                               description: Información adicional para obtener más contexto sobre lo encontrado al realizar la consulta en el servicio
                               minProperties: 2
                               properties:
+                                score:
+                                  type: number
+                                  description: Puntuación obtenida para el servicio tras finalizar la consulta (no aplica para todos los servicios)
                                 generates_risk:
                                   type: boolean
                                   description: Indica si los resultados obtenidos por el servicio arrojan alertas para la identidad consultada
@@ -492,6 +488,9 @@ paths:
                       is_partial_response:
                         type: boolean
                         description: Indica si algún servicio presento fallas y por ende se entrega una respuesta parcial sujeta a cambios cuando el servicio fallido se encuentre activo de nuevo
+                      score:
+                        type: number
+                        description: Puntaje global obtenido en la validación
                 required:
                   - data
               examples:
@@ -549,6 +548,7 @@ paths:
                 type: string
                 default: application/json
               required: true
+              description: Indica al cliente que tipo de contenido será retornado
         '204':
           description: |-
             Esta respuesta indica que no se tiene información a mostrar respecto a la validación de identidad consultada
@@ -562,6 +562,7 @@ paths:
                 type: string
                 default: application/json
               required: true
+              description: Indica al cliente que tipo de contenido será retornado
         '401':
           description: |-
             Esta respuesta indica que hay problemas con la autenticación
@@ -599,6 +600,7 @@ paths:
                 type: string
                 default: application/json
               required: true
+              description: Indica al cliente que tipo de contenido será retornado
         '404':
           description: |-
             Esta respuesta indica que no existe la URL a la que se esta solicitando la validación de identidad
@@ -632,6 +634,7 @@ paths:
             Content-Type:
               schema:
                 type: string
+              description: Indica al cliente que tipo de contenido será retornado
         '405':
           description: 'Esta respuesta indica que el método HTTP (GET, POST, etc..) usado al momento de realizar la petición no es el correcto'
           content:
@@ -657,6 +660,7 @@ paths:
             Content-Type:
               schema:
                 type: string
+              description: Indica al cliente que tipo de contenido será retornado
         '422':
           description: |-
             Esta respuesta indica que no es posible procesar la solicitud debido a problemas el identificador de la validación de identidad
@@ -696,6 +700,7 @@ paths:
                 type: string
                 default: application/json
               required: true
+              description: Indica al cliente que tipo de contenido será retornado
         '500':
           description: 'Esta respuesta indica que ocurrió un error no soportado durante el procesamiento de la petición enviada, por lo anterior no es posible entregar el detalle de la validación de identidad'
           content:
@@ -724,6 +729,7 @@ paths:
             Content-Type:
               schema:
                 type: string
+              description: Indica al cliente que tipo de contenido será retornado
       operationId: get-query-request_id
       parameters:
         - schema:
