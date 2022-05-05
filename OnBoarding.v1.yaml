@@ -441,6 +441,15 @@ paths:
                   data:
                     type: object
                     properties:
+                      allow_access:
+                        type: boolean
+                        description: Indica si al finalizar la validación se sugiere permitir el acceso al usuario lo cual sucede si ningún servicio genera alertas
+                      is_partial_response:
+                        type: boolean
+                        description: Indica si algún servicio presento fallas y por ende se entrega una respuesta parcial sujeta a cambios cuando el servicio fallido se encuentre activo de nuevo
+                      score:
+                        type: number
+                        description: Puntaje global obtenido en la validación
                       summary:
                         type: array
                         description: Resumen de la validación realizada y los servicios ejecutados
@@ -456,8 +465,8 @@ paths:
                               description: Nombre del servicio
                               enum:
                                 - TFA
-                                - SRALAFT
                                 - PERSONAL_INFORMATION
+                                - SARLAFT
                             service_status:
                               type: string
                               enum:
@@ -473,24 +482,15 @@ paths:
                                 score:
                                   type: number
                                   description: Puntuación obtenida para el servicio tras finalizar la consulta (no aplica para todos los servicios)
-                                generates_risk:
-                                  type: boolean
-                                  description: Indica si los resultados obtenidos por el servicio arrojan alertas para la identidad consultada
                                 details:
                                   type: object
                                   description: Resumen de lo obtenido por el servicio (la estructura interna varia de acuerdo a cada servicio o proveedor)
+                                generates_risk:
+                                  type: boolean
+                                  description: Indica si los resultados obtenidos por el servicio arrojan alertas para la identidad consultada
                             continue_if_fails:
                               type: boolean
                               description: Indica si el cliente configuro no detener una validación si el servicio falla al realizar una consulta en este
-                      allow_access:
-                        type: boolean
-                        description: Indica si al finalizar la validación se sugiere permitir el acceso al usuario lo cual sucede si ningún servicio genera alertas
-                      is_partial_response:
-                        type: boolean
-                        description: Indica si algún servicio presento fallas y por ende se entrega una respuesta parcial sujeta a cambios cuando el servicio fallido se encuentre activo de nuevo
-                      score:
-                        type: number
-                        description: Puntaje global obtenido en la validación
                 required:
                   - data
               examples:
@@ -579,14 +579,14 @@ paths:
                     type: object
                     minProperties: 1
                     maxProperties: 1
+                    description: Detalle de los errores
                     required:
                       - message
-                    description: Detalle de los errores
                     properties:
                       message:
                         type: string
                         default: These credentials do not match our records.
-                        description: ''
+                        description: Detalle del error que originó la respuesta
                 required:
                   - errors
               examples:
@@ -616,13 +616,14 @@ paths:
                     type: object
                     minProperties: 1
                     maxProperties: 1
+                    description: Detalle de los errores
                     required:
                       - message
-                    description: Detalle de los errores
                     properties:
                       message:
                         type: string
                         default: the requested resource is not defined
+                        description: Detalle del error que originó la respuesta
                 required:
                   - errors
               examples:
@@ -645,15 +646,16 @@ paths:
                 properties:
                   errors:
                     type: object
-                    required:
-                      - message
                     minProperties: 1
                     maxProperties: 1
                     description: Detalle de los errores
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
                         minLength: 1
+                        description: Detalle del error que originó la respuesta
                 required:
                   - errors
           headers:
@@ -678,13 +680,14 @@ paths:
                     type: object
                     minProperties: 1
                     maxProperties: 1
+                    description: Detalle de los errores
                     required:
                       - identification
-                    description: Detalle de los errores
                     properties:
                       identification:
                         type: array
                         minItems: 1
+                        description: Detalle del error que originó la respuesta
                         items: {}
                 required:
                   - errors
@@ -712,12 +715,13 @@ paths:
                     type: object
                     minProperties: 1
                     maxProperties: 1
+                    description: Detalle de los errores
                     required:
                       - message
-                    description: Detalle de los errores
                     properties:
                       message:
                         type: string
+                        description: Detalle del error que originó la respuesta
                 required:
                   - errors
               examples:
