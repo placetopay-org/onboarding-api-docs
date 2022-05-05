@@ -32,10 +32,10 @@ paths:
                     type: object
                     minProperties: 2
                     maxProperties: 2
+                    description: Detalle del resultado de procesar la solicitud de validación de identidad
                     required:
                       - request_id
                       - url
-                    description: Detalle del resultado de procesar la solicitud de validación de identidad
                     properties:
                       request_id:
                         type: integer
@@ -47,6 +47,9 @@ paths:
                         type: string
                         description: url generada donde se debe redireccionar al usuario abriendo una nueva pestaña en el navegador o dentro de un iframe
                         format: uri
+                      initial_status:
+                        type: number
+                        description: Generalmente es un estado intermedio. Indica el estatus en el cual se encuentra el proceso de validación.
                 required:
                   - data
               examples:
@@ -60,8 +63,8 @@ paths:
               schema:
                 type: string
                 default: application/json
-              description: ''
               required: true
+              description: Indica al cliente que tipo de contenido será retornado
         '401':
           description: |-
             Esta respuesta indica que hay problemas con la autenticación
