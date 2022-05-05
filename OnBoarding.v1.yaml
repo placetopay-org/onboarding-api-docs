@@ -88,6 +88,7 @@ paths:
                       message:
                         type: string
                         default: These credentials do not match our records.
+                        description: Detalle del error que originó la respuesta
                 required:
                   - errors
               examples:
@@ -100,7 +101,7 @@ paths:
               schema:
                 type: string
                 default: application/json
-              description: ''
+              description: Indica al cliente que tipo de contenido será retornado
               required: true
         '404':
           description: |-
@@ -115,14 +116,15 @@ paths:
                 properties:
                   errors:
                     type: object
-                    required:
-                      - message
                     minProperties: 1
                     maxProperties: 1
                     description: Detalle de los errores
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
+                        description: Detalle del error que originó la respuesta
                 required:
                   - errors
               examples:
@@ -135,7 +137,7 @@ paths:
               schema:
                 type: string
                 default: application/json
-              description: ''
+              description: Indica al cliente que tipo de contenido será retornado
               required: true
         '405':
           description: 'Esta respuesta indica que el método HTTP (GET, POST, etc..) usado al momento de realizar la petición no es el correcto'
@@ -147,21 +149,23 @@ paths:
                 properties:
                   errors:
                     type: object
-                    required:
-                      - message
                     minProperties: 1
                     maxProperties: 1
                     description: Detalle de los errores
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
                         minLength: 1
+                        description: Detalle del error que originó la respuesta
                 required:
                   - errors
           headers:
             Content-Type:
               schema:
                 type: string
+              description: Indica al cliente que tipo de contenido será retornado
         '422':
           description: |-
             Esta respuesta indica que alguno de los campo no se envió o diligencio correctamente
@@ -214,7 +218,7 @@ paths:
               schema:
                 type: string
                 default: application/json
-              description: ''
+              description: Indica al cliente que tipo de contenido será retornado
               required: true
         '500':
           description: 'Esta respuesta indica que ocurrió un error no soportado durante el procesamiento de la petición enviada, por lo anterior el proceso de validación de identidad no fue iniciado'
@@ -225,14 +229,15 @@ paths:
                 properties:
                   errors:
                     type: object
-                    required:
-                      - message
                     minProperties: 1
                     description: Detalle de los errores
                     maxProperties: 1
+                    required:
+                      - message
                     properties:
                       message:
                         type: string
+                        description: Detalle del error que originó la respuesta
                 required:
                   - errors
               examples:
@@ -245,7 +250,7 @@ paths:
               schema:
                 type: string
                 default: application/json
-              description: ''
+              description: Indica al cliente que tipo de contenido será retornado
               required: true
       description: |-
         Con esta solicitud POST podrá iniciar una validación de identidad. Las validaciones realizadas están asociadas a los módulos activados en la configuración del panel.
