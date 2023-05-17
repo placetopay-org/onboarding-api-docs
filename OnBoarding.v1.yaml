@@ -388,10 +388,9 @@ paths:
                       mobile: '3152364205'
                       mobile_prefix: 57
                       mobile_country: CO
-                  device_channel: BROWSER
                   locale: es
-                  device_fingerprint:
-                    abc: 123
+                  denial_url: 'https://redirection.testing.com/denial_url'
+                  approval_url: 'https://redirection.testing.com/approval_url'
         description: |-
           Se requiere que sea enviado un conjunto de información publica y privada asociada a la identidad a validar. 
 
