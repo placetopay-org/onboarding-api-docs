@@ -49,7 +49,7 @@ paths:
                         format: uri
                       initial_status:
                         type: number
-                        description: Generalmente es un estado intermedio. Indica el estatus en el cual se encuentra el proceso de validación.
+                        description: Generalmente es un estado intermedio. Indica el estatus en el cual se encuentra el proceso de validación
                 required:
                   - data
               examples:
@@ -58,6 +58,7 @@ paths:
                     data:
                       request_id: 19
                       url: 'https://onboarding.placetopay.ws/validation/50?signature=eb9dc748c05be76884d012714d0614d3d863efc17348faeb6379807e40fb0606'
+                      initial_status: 4
           headers:
             Content-Type:
               schema:
