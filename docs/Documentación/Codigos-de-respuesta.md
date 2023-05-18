@@ -32,6 +32,6 @@ La siguiente tabla lista los diferentes códigos que entrega el servicio en la p
 | Coincide con riesgo - Documento - Finalizado   | 21     |
 | Coincide con riesgo - Documento de problema - Finalizado | 22     |
 | SARLAFT - En cola                             | 37     |
-| SARLAFT - Finalizado                          | 37     |
+| SARLAFT - Finalizado                          | 38     |
 
 
