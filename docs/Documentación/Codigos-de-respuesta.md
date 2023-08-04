@@ -2,7 +2,7 @@
 stoplight-id: n64fmc6pmmxuy
 ---
 
-# Codigos de respuesta
+# Códigos de respuesta
 
 La siguiente tabla lista los diferentes códigos que entrega el servicio en la propiedad `initial_status` al realizar una solicitud de validación de identidad:
 
